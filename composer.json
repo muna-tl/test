@@ -1,0 +1,7 @@
+{
+    "require": {
+        "symfony/console": "^7.3",
+        "doctrine/orm": "^3.5",
+        "symfony/framework-bundle": "^7.3"
+    }
+}
