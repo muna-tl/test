@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Rendez-vous - {{ user.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ path('app_dashboard') }}">
+                        <i class="fas fa-user me-2"></i>
+                        {{ user.fullName }}
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-calendar me-2"></i>Patient
+                        </span>
+                        <a class="btn btn-light" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row mb-2">
+            <div class="col-12 text-start">
+                <a href="{{ path('app_dashboard') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-history me-2"></i>
+                            Historique de mes Rendez-vous
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if appointments|length == 0 %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucun rendez-vous trouvé pour le moment.
+            </div>
+            <div class="text-center mt-4">
+                <a href="{{ path('appointment_specialties') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Prendre un rendez-vous
+                </a>
+            </div>
+        {% else %}
+            <div class="card shadow-lg border-0">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Heure</th>
+                                    <th>Docteur</th>
+                                    <th>Spécialité</th>
+                                    <th>Statut</th>
+                                    <th>Note</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.appointmentDate|date('d/m/Y') }}</td>
+                                        <td>{{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</td>
+                                        <td>
+                                            <strong>Dr. {{ appointment.doctor.user.fullName }}</strong><br>
+                                            <small class="text-muted">{{ appointment.doctor.user.email }}</small>
+                                        </td>
+                                        <td>{{ appointment.doctor.specialty }}</td>
+                                        <td>
+                                            {% if appointment.status == 'confirmed' %}
+                                                <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+                                                    <i class="fas fa-clock me-1"></i>Confirmé
+                                                </span>
+                                            {% elseif appointment.status == 'done' %}
+                                                <span class="badge rounded-pill bg-success px-3 py-2">
+                                                    <i class="fas fa-check-circle me-1"></i>Terminé
+                                                </span>
+                                            {% elseif appointment.status == 'canceled' %}
+                                                <span class="badge rounded-pill bg-danger px-3 py-2">
+                                                    <i class="fas fa-times-circle me-1"></i>Annulé
+                                                </span>
+                                            {% else %}
+                                                <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                                                    <i class="fas fa-hourglass-half me-1"></i>En attente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ appointment.note|default('Aucune note') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ path('appointment_specialties') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Prendre un nouveau rendez-vous
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

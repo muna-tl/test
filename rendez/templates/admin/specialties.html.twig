@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Spécialités - Admin{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ path('admin_dashboard') }}">
+                        <i class="fas fa-hospital-alt me-2"></i>
+                        Hôpital Cheikh Zaid - Admin
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <a class="btn btn-outline-light me-3" href="{{ path('admin_dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                        <a class="btn btn-outline-light me-3" href="{{ path('admin_add_doctor') }}">
+                            <i class="fas fa-user-md me-2"></i>
+                            Ajouter un docteur
+                        </a>
+                        <a class="btn btn-light" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            Gestion des Spécialités
+                        </h2>
+                        <p class="mb-0 mt-2">Configurez les spécialités disponibles pour les rendez-vous</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for flash_error in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                {{ flash_error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        
+        {% for flash_success in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                {{ flash_success }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <div class="row mt-4">
+            <!-- Add New Specialty -->
+            <div class="col-md-4">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus me-2"></i>
+                            Ajouter une Spécialité
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <input type="hidden" name="action" value="add">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nom de la spécialité <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Description optionnelle..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-2"></i>
+                                Ajouter
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Specialties -->
+            <div class="col-md-8">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Spécialités Existantes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if specialties is empty %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucune spécialité configurée. Ajoutez votre première spécialité pour commencer.
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>Description</th>
+                                            <th>Statut</th>
+                                            <th>Date de création</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for specialty in specialties %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ specialty.name }}</strong>
+                                                </td>
+                                                <td>
+                                                    {{ specialty.description|default('Aucune description') }}
+                                                </td>
+                                                <td>
+                                                    {% if specialty.isActive %}
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check me-1"></i>Active
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-times me-1"></i>Inactive
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ specialty.createdAt|date('d/m/Y H:i') }}
+                                                </td>
+                                                <td>
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="action" value="toggle">
+                                                        <input type="hidden" name="id" value="{{ specialty.id }}">
+                                                        <button type="submit" 
+                                                                class="btn btn-sm {% if specialty.isActive %}btn-warning{% else %}btn-success{% endif %}"
+                                                                onclick="return confirm('Êtes-vous sûr de vouloir {{ specialty.isActive ? 'désactiver' : 'activer' }} cette spécialité ?')">
+                                                            {% if specialty.isActive %}
+                                                                <i class="fas fa-eye-slash me-1"></i>Désactiver
+                                                            {% else %}
+                                                                <i class="fas fa-eye me-1"></i>Activer
+                                                            {% endif %}
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Card -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow border-0 border-start border-primary border-5">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Information importante
+                        </h6>
+                        <p class="card-text mb-0">
+                            Les patients ne pourront prendre rendez-vous que pour les spécialités <strong>actives</strong>. 
+                            Assurez-vous que toutes les spécialités nécessaires sont activées et qu'il y a des docteurs disponibles pour chacune d'entre elles.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

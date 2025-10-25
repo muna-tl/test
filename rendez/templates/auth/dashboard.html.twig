@@ -1,0 +1,173 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - Système de Rendez-vous Hospitalier{% endblock %}
+
+{% block body %}
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-hospital fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="mb-0">Système de Rendez-vous Hospitalier</h2>
+                        <p class="text-muted mb-0">Tableau de bord</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <a href="{{ path('app_logout') }}" class="btn btn-danger" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Se déconnecter
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="welcome-card">
+                <div class="text-center mb-4">
+                    {% if user.hasRole('ROLE_ADMIN') %}
+                        <i class="fas fa-user-shield fa-4x text-danger mb-3"></i>
+                    {% elseif user.hasRole('ROLE_DOCTOR') %}
+                        <i class="fas fa-user-md fa-4x text-success mb-3"></i>
+                    {% else %}
+                        <i class="fas fa-user fa-4x text-primary mb-3"></i>
+                    {% endif %}
+                </div>
+
+                <div class="text-center mb-4">
+                    <h3>Bienvenue, {{ user.fullName }} !</h3>
+                    <span class="role-badge {% if user.hasRole('ROLE_ADMIN') %}role-admin{% elseif user.hasRole('ROLE_DOCTOR') %}role-doctor{% else %}role-patient{% endif %}">
+                        {{ user.roleLabel }}
+                    </span>
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                            <h6>Email</h6>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-phone fa-2x text-success mb-2"></i>
+                            <h6>Téléphone</h6>
+                            <small class="text-muted">{{ user.phone ?? 'Non renseigné' }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-calendar fa-2x text-warning mb-2"></i>
+                            <h6>Inscrit le</h6>
+                            <small class="text-muted">{{ user.createdAt|date('d/m/Y') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <h5 class="mb-3">Actions disponibles</h5>
+                    <div class="row">
+                        {% if user.hasRole('ROLE_ADMIN') %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                        <h6>Gestion des utilisateurs</h6>
+                                        <p class="card-text">Gérer les comptes patients et docteurs</p>
+                                        <!-- Bouton supprimé -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                                        <h6>Gestion des rendez-vous</h6>
+                                        <p class="card-text">Voir et gérer tous les rendez-vous</p>
+                                        <a href="{{ path('app_dashboard') }}" class="btn btn-success btn-sm">Voir l'historique</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elseif user.hasRole('ROLE_DOCTOR') %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                                        <h6>Mes rendez-vous</h6>
+                                        <p class="card-text">Voir mes rendez-vous programmés</p>
+                                        <a href="{{ path('doctor_calendar') }}" class="btn btn-success btn-sm">Accéder</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                        <h6>Historique des patients</h6>
+                                        <p class="card-text">Consulter l'historique de mes patients</p>
+                                        <a href="{{ path('doctor_patients_history') }}" class="btn btn-primary btn-sm">Voir l'historique</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        {% else %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-plus fa-3x text-primary mb-3"></i>
+                                        <h6>Prendre rendez-vous</h6>
+                                        <p class="card-text">Programmer un nouveau rendez-vous</p>
+                                        <a href="{{ path('appointment_specialties') }}" class="btn btn-primary btn-sm">Prendre RDV</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-history fa-3x text-success mb-3"></i>
+                                        <h6>Mes rendez-vous</h6>
+                                        <p class="card-text">Voir l'historique de mes rendez-vous</p>
+                                        <a href="{{ path('patient_appointments') }}" class="btn btn-success btn-sm">Voir l'historique</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if user.hasRole('ROLE_ADMIN') %}
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Administrateur :</strong> Vous avez accès à toutes les fonctionnalités du système.
+                </div>
+                {% elseif user.hasRole('ROLE_DOCTOR') %}
+                <div class="alert alert-success mt-4">
+                    <i class="fas fa-stethoscope me-2"></i>
+                    <strong>Docteur :</strong> Vous pouvez gérer vos patients et vos rendez-vous.
+                </div>
+                {% else %}
+                <div class="alert alert-primary mt-4">
+                    <i class="fas fa-user me-2"></i>
+                    <strong>Patient :</strong> Vous pouvez prendre des rendez-vous et consulter votre historique.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmLogout() {
+    return confirm('Êtes-vous sûr de vouloir vous déconnecter ?');
+}
+</script>
+{% endblock %}

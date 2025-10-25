@@ -1,0 +1,296 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Hôpital Cheikh Zaid{% endblock %}
+
+{% block body %}
+<header class="bg-primary text-white py-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="fas fa-hospital fa-3x"></i>
+            </div>
+            <div>
+                <h1 class="mb-0">Hôpital Cheikh Zaid</h1>
+                <small>Fondation - Excellence en Soins de Santé</small>
+            </div>
+        </div>
+        <div>
+            <a href="{{ path('app_login') }}" class="btn btn-light">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container py-5">
+    <!-- Description de l'hôpital -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto text-center">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <i class="fas fa-heartbeat text-primary fa-4x"></i>
+                    </div>
+                    <h2 class="text-primary mb-3">Bienvenue à l'Hôpital Cheikh Zaid</h2>
+                    <p class="lead">
+                        L'Hôpital Cheikh Zaid est un établissement de soins de référence, offrant des services médicaux 
+                        de haute qualité avec une équipe de professionnels expérimentés. Notre mission est de fournir 
+                        des soins exceptionnels dans un environnement moderne et accueillant.
+                    </p>
+                    <p>
+                        Nous disposons d'équipements de pointe et d'une équipe médicale spécialisée dans diverses 
+                        disciplines pour répondre à tous vos besoins de santé.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Spécialités Médicales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush" id="specialty-list">
+                        {% for specialty in specialties %}
+                            <button data-specialty="{{ specialty.name }}" class="list-group-item list-group-item-action specialty-item border-0 py-3">
+                                <i class="fas fa-chevron-right me-2 text-primary"></i>{{ specialty.name }}
+                            </button>
+                        {% else %}
+                            <div class="alert alert-info">Aucune spécialité trouvée.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Nos Médecins</h5>
+                    <small id="selected-specialty" class="opacity-75"></small>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input id="doctor-search" class="form-control" placeholder="Rechercher un médecin par nom...">
+                        </div>
+                    </div>
+                    <div id="doctors-panel" style="min-height:300px; max-height:400px; overflow-y:auto;">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-hand-pointer fa-3x mb-3 opacity-50"></i>
+                            <p>Sélectionnez une spécialité à gauche pour voir la liste des médecins disponibles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <!-- Horaires d'ouverture -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Horaires d'ouverture</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <strong>Lundi - Vendredi</strong>
+                            <span>08:00 - 17:00</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-2 border-bottom">
+                            <strong>Samedi</strong>
+                            <span>09:00 - 13:00</span>
+                        </li>
+                        <li class="d-flex justify-content-between py-2">
+                            <strong>Dimanche</strong>
+                            <span class="text-danger">Fermé</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Prise de rendez-vous -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Prendre Rendez-vous</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-info-circle fa-2x text-info"></i>
+                    </div>
+                    <h6 class="text-primary">Comment prendre rendez-vous ?</h6>
+                    <p class="small text-muted">
+                        La prise de rendez-vous se fait après inscription et connexion à votre espace personnel. 
+                        Créez un compte pour réserver en ligne avec nos médecins spécialisés.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_register') }}" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Créer un compte
+                        </a>
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i>Déjà inscrit ? Se connecter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Services supplémentaires -->
+<div class="bg-light py-5 mt-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-ambulance text-primary fa-3x mb-3"></i>
+                        <h5>Urgences 24h/24</h5>
+                        <p class="text-muted">Service d'urgence disponible en permanence</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-microscope text-primary fa-3x mb-3"></i>
+                        <h5>Laboratoire Moderne</h5>
+                        <p class="text-muted">Analyses médicales avec équipements de pointe</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 h-100">
+                    <div class="card-body">
+                        <i class="fas fa-pills text-primary fa-3x mb-3"></i>
+                        <h5>Pharmacie Interne</h5>
+                        <p class="text-muted">Médicaments disponibles sur place</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const specialtyButtons = document.querySelectorAll('.specialty-item');
+        const doctorsPanel = document.getElementById('doctors-panel');
+        const searchInput = document.getElementById('doctor-search');
+        const selectedSpecialtyLabel = document.getElementById('selected-specialty');
+
+        function loadDoctors(specialty) {
+            doctorsPanel.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2">Chargement des médecins...</p></div>';
+            selectedSpecialtyLabel.textContent = specialty;
+            
+            fetch('{{ path('appointment_doctors', {'specialty': 'SPECIALTY_PLACEHOLDER'}) }}'.replace('SPECIALTY_PLACEHOLDER', encodeURIComponent(specialty)))
+                .then(r => r.text())
+                .then(html => {
+                    // try to extract the doctors list from the returned page
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+                    const list = tmp.querySelector('#doctors-list') || tmp.querySelector('.list-group') || tmp.querySelector('.card-body');
+                    if (list) {
+                        doctorsPanel.innerHTML = '';
+                        const clonedList = list.cloneNode(true);
+                        // Add some styling to the cloned content
+                        clonedList.classList.add('doctors-container');
+                        doctorsPanel.appendChild(clonedList);
+                        
+                        // Add click handlers for doctor cards if they exist
+                        const doctorCards = doctorsPanel.querySelectorAll('.card, .list-group-item');
+                        doctorCards.forEach(card => {
+                            card.style.cursor = 'pointer';
+                            card.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const doctorName = this.querySelector('h5, .card-title, strong')?.textContent || 'Médecin';
+                                alert('Pour prendre rendez-vous avec ' + doctorName + ', veuillez d\'abord créer un compte et vous connecter.');
+                            });
+                        });
+                    } else {
+                        doctorsPanel.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>Aucun médecin trouvé pour cette spécialité.</div>';
+                    }
+                })
+                .catch(() => {
+                    doctorsPanel.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Erreur lors du chargement des médecins. Veuillez réessayer.</div>';
+                });
+            
+            fetch('{{ path('appointment_doctors', {'specialty': 'SPECIALTY_PLACEHOLDER'}) }}'.replace('SPECIALTY_PLACEHOLDER', encodeURIComponent(specialty)))
+                .then(r => r.text())
+                .then(html => {
+                    // try to extract the doctors list from the returned page
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+                    const list = tmp.querySelector('#doctors-list') || tmp.querySelector('.list-group') || tmp.querySelector('.card-body');
+                    if (list) {
+                        doctorsPanel.innerHTML = '';
+                        const clonedList = list.cloneNode(true);
+                        // Add some styling to the cloned content
+                        clonedList.classList.add('doctors-container');
+                        doctorsPanel.appendChild(clonedList);
+                        
+                        // Add click handlers for doctor cards if they exist
+                        const doctorCards = doctorsPanel.querySelectorAll('.card, .list-group-item');
+                        doctorCards.forEach(card => {
+                            card.style.cursor = 'pointer';
+                            card.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const doctorName = this.querySelector('h5, .card-title, strong')?.textContent || 'Médecin';
+                                alert('Pour prendre rendez-vous avec ' + doctorName + ', veuillez d\'abord créer un compte et vous connecter.');
+                            });
+                        });
+        }
+
+        specialtyButtons.forEach(b => b.addEventListener('click', function(){
+            const s = this.dataset.specialty;
+            // highlight selection
+            specialtyButtons.forEach(x => x.classList.remove('active', 'bg-primary', 'text-white'));
+            this.classList.add('active', 'bg-primary', 'text-white');
+            loadDoctors(s);
+        }));
+
+        searchInput.addEventListener('input', function(){
+            const q = this.value.toLowerCase();
+            const items = doctorsPanel.querySelectorAll('.card, .list-group-item');
+            items.forEach(it => {
+                const txt = it.textContent.toLowerCase();
+                it.style.display = txt.includes(q) ? '' : 'none';
+            });
+        });
+
+        // Auto-load first specialty on page load
+        if (specialtyButtons.length > 0) {
+            setTimeout(() => {
+                specialtyButtons[0].click();
+            }, 500);
+        }
+    })();
+</script>
+
+<style>
+    .specialty-item:hover {
+        background-color: var(--bs-primary) !important;
+        color: white !important;
+        transform: translateX(5px);
+        transition: all 0.2s ease;
+    }
+    
+    .doctors-container .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .doctors-container .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .list-group-item.active {
+        border-color: var(--bs-primary);
+    }
+</style>
+{% endblock %}

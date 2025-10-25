@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+// Support setups where composer dependencies are installed one level above the project
+// (e.g. workspace root). Try the local vendor first, then fall back to the parent vendor.
+$localVendorDir = dirname(__DIR__).'/vendor';
+$parentVendorDir = dirname(dirname(__DIR__)).'/vendor';
+
+if (is_file($localVendorDir.'/autoload_runtime.php')) {
+    require_once $localVendorDir.'/autoload_runtime.php';
+    return function (array $context) {
+        $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+        return new Application($kernel);
+    };
+}
+
+if (is_file($parentVendorDir.'/autoload_runtime.php')) {
+    require_once $parentVendorDir.'/autoload_runtime.php';
+    return function (array $context) {
+        $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+        return new Application($kernel);
+    };
+}
+
+// Fallback: if autoload_runtime is not available, try plain Composer autoload and run the app
+if (is_file($localVendorDir.'/autoload.php')) {
+    require_once $localVendorDir.'/autoload.php';
+    $kernel = new Kernel($_SERVER['APP_ENV'] ?? 'dev', (bool) ($_SERVER['APP_DEBUG'] ?? true));
+    $application = new Application($kernel);
+    $application->run();
+    exit(0);
+}
+
+if (is_file($parentVendorDir.'/autoload.php')) {
+    require_once $parentVendorDir.'/autoload.php';
+    $kernel = new Kernel($_SERVER['APP_ENV'] ?? 'dev', (bool) ($_SERVER['APP_DEBUG'] ?? true));
+    $application = new Application($kernel);
+    $application->run();
+    exit(0);
+}
+
+throw new LogicException('Dependencies are missing. Try running "composer install".');

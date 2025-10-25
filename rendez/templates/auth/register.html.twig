@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - Système de Rendez-vous Hospitalier{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-user-plus fa-2x mb-3"></i>
+            <h1>Créer un compte</h1>
+            <p>Rejoignez notre système de gestion des rendez-vous hospitaliers</p>
+        </div>
+        
+        <div class="auth-body">
+            {% for flash_message in app.flashes('success') %}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>{{ flash_message }}
+                </div>
+            {% endfor %}
+
+            {% for flash_message in app.flashes('error') %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{ flash_message }}
+                </div>
+            {% endfor %}
+
+            {{ form_start(registrationForm) }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(registrationForm.firstName) }}
+                        {{ form_widget(registrationForm.firstName) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_label(registrationForm.lastName) }}
+                        {{ form_widget(registrationForm.lastName) }}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(registrationForm.email) }}
+                    {{ form_widget(registrationForm.email) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(registrationForm.phone) }}
+                    {{ form_widget(registrationForm.phone) }}
+                    {{ form_errors(registrationForm.phone) }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Sexe</label>
+                    <div class="mt-2">
+                        {% for choice in registrationForm.gender %}
+                            <div class="form-check mb-2">
+                                {{ form_widget(choice, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(choice, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(registrationForm.gender) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(registrationForm.plainPassword.first) }}
+                    {{ form_widget(registrationForm.plainPassword.first) }}
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(registrationForm.plainPassword.second) }}
+                    {{ form_widget(registrationForm.plainPassword.second) }}
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+
+                <div class="form-check mb-3">
+                    {{ form_widget(registrationForm.agreeTerms) }}
+                    {{ form_label(registrationForm.agreeTerms) }}
+                    {{ form_errors(registrationForm.agreeTerms) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary mb-3">
+                    <i class="fas fa-user-plus me-2"></i>Créer mon compte
+                </button>
+            {{ form_end(registrationForm) }}
+
+            <div class="divider">
+                <span>Déjà inscrit ?</span>
+            </div>
+
+            <a href="{{ path('app_login') }}" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

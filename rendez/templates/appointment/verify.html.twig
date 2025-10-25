@@ -1,0 +1,69 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de Rendez-vous{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">✓ Confirmation de Rendez-vous</h4>
+                </div>
+                <div class="card-body p-4">
+                    {% if found %}
+                        <div class="confirmation-code text-center mb-4">
+                            <p style="margin: 0; font-size: 0.9em; color: #666;">Code de Confirmation</p>
+                            <h2 style="color: #2563eb; margin: 5px 0; font-size: 2em; letter-spacing: 2px;">{{ appointment.confirmationCode }}</h2>
+                        </div>
+
+                        <div class="details mb-4" style="margin: 0 auto; width: 80%;">
+                            <h5 style="color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Détails du Rendez-vous</h5>
+                            <p><strong>👨‍⚕️ Docteur :</strong> {{ appointment.doctor.user.fullName }} ({{ appointment.doctor.specialty }})</p>
+                            <p><strong>📅 Date :</strong> {{ appointment.startAt|date('d/m/Y') }}</p>
+                            <p><strong>🕐 Heure :</strong> {{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</p>
+                            <p><strong>👤 Patient :</strong> {{ appointment.patient.fullName }}</p>
+                            {% if appointment.note %}
+                            <p><strong>� Note :</strong> {{ appointment.note }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="qr-section text-center mb-4" style="margin: 30px auto; padding: 20px; background-color: #f9fafb; border-radius: 8px; width: 80%;">
+                            <h3 style="color: #2563eb; margin-bottom: 15px;">Code QR de Confirmation</h3>
+                            {% if qrCodeDataUrl %}
+                                <img src="{{ qrCodeDataUrl }}" alt="QR Code" width="200" height="200" style="border: 2px solid #e5e7eb; border-radius: 8px; padding: 10px; background-color: white;">
+                                <p>Scannez ce code QR pour confirmer votre rendez-vous</p>
+                                <p style="font-size: 0.85em;">Code: {{ appointment.confirmationCode }}</p>
+                            {% else %}
+                                <p style="color: #ef4444;">Le code QR n'a pas pu être généré</p>
+                                <p>Code de confirmation: <strong>{{ appointment.confirmationCode }}</strong></p>
+                            {% endif %}
+                        </div>
+
+                        <div class="footer text-center mt-4" style="font-size: 0.9em; color: #888; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                            <p><strong>Important :</strong> Veuillez présenter ce document lors de votre visite.</p>
+                            <p>Pour toute modification ou annulation, veuillez contacter le secrétariat.</p>
+                            <p style="margin-top: 15px; font-size: 0.85em;">Document généré le {{ "now"|date('d/m/Y à H:i') }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">❌ Code Non Trouvé</h5>
+                            <p class="mb-0">Le code de confirmation <strong>{{ code }}</strong> n'existe pas dans notre système.</p>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p>Veuillez vérifier que vous avez scanné le bon code QR.</p>
+                            <p class="text-muted small">Si le problème persiste, contactez le secrétariat.</p>
+                        </div>
+                    {% endif %}
+                    <div class="text-center mt-4">
+                        <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+                            <i class="fa fa-home"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Système de Rendez-vous Hospitalier{% endblock %}</title>
+        
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        
+        <style>
+            :root {
+                --primary-color: #2563eb;
+                --secondary-color: #1e40af;
+                --success-color: #059669;
+                --danger-color: #dc2626;
+                --warning-color: #d97706;
+                --light-color: #f8fafc;
+                --dark-color: #1e293b;
+                --border-color: #e2e8f0;
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                color: var(--dark-color);
+            }
+
+            .auth-container {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .auth-card {
+                background: white;
+                border-radius: 20px;
+                box-shadow: var(--shadow-lg);
+                overflow: hidden;
+                max-width: 450px;
+                width: 100%;
+                border: 1px solid var(--border-color);
+            }
+
+            .auth-header {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .auth-header h1 {
+                font-size: 24px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .auth-header p {
+                opacity: 0.9;
+                font-size: 14px;
+            }
+
+            .auth-body {
+                padding: 30px;
+            }
+
+            .form-label {
+                font-weight: 500;
+                color: var(--dark-color);
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .form-control {
+                border: 1px solid var(--border-color);
+                border-radius: 10px;
+                padding: 12px 15px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                background-color: #fafbfc;
+            }
+
+            .form-control:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                background-color: white;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                border: none;
+                border-radius: 10px;
+                padding: 12px 20px;
+                font-weight: 500;
+                width: 100%;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+            }
+
+            .btn-secondary {
+                background: transparent;
+                border: 1px solid var(--border-color);
+                color: var(--dark-color);
+                border-radius: 10px;
+                padding: 12px 20px;
+                font-weight: 500;
+                width: 100%;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .btn-secondary:hover {
+                background-color: var(--light-color);
+                border-color: var(--primary-color);
+            }
+
+            .btn-danger {
+                background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+                border: none;
+                border-radius: 10px;
+                padding: 12px 20px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                font-size: 14px;
+            }
+
+            .alert {
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 20px;
+                border: none;
+                font-size: 14px;
+            }
+
+            .alert-success {
+                background-color: rgba(5, 150, 105, 0.1);
+                color: var(--success-color);
+                border-left: 4px solid var(--success-color);
+            }
+
+            .alert-danger {
+                background-color: rgba(220, 38, 38, 0.1);
+                color: var(--danger-color);
+                border-left: 4px solid var(--danger-color);
+            }
+
+            .form-check {
+                margin: 15px 0;
+            }
+
+            .form-check-input:checked {
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+
+            .text-link {
+                color: var(--primary-color);
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+            .text-link:hover {
+                color: var(--secondary-color);
+                text-decoration: underline;
+            }
+
+            .divider {
+                text-align: center;
+                margin: 25px 0;
+                position: relative;
+            }
+
+            .divider::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: var(--border-color);
+            }
+
+            .divider span {
+                background: white;
+                padding: 0 15px;
+                color: #6b7280;
+                font-size: 12px;
+            }
+
+            .dashboard-header {
+                background: white;
+                padding: 20px 0;
+                box-shadow: var(--shadow);
+                margin-bottom: 30px;
+            }
+
+            .welcome-card {
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                box-shadow: var(--shadow);
+                border: 1px solid var(--border-color);
+            }
+
+            .role-badge {
+                display: inline-block;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+
+            .role-patient {
+                background-color: rgba(37, 99, 235, 0.1);
+                color: var(--primary-color);
+            }
+
+            .role-doctor {
+                background-color: rgba(5, 150, 105, 0.1);
+                color: var(--success-color);
+            }
+
+            .role-admin {
+                background-color: rgba(220, 38, 38, 0.1);
+                color: var(--danger-color);
+            }
+
+            @media (max-width: 768px) {
+                .auth-container {
+                    padding: 10px;
+                }
+                
+                .auth-card {
+                    margin: 10px;
+                }
+                
+                .auth-header {
+                    padding: 20px;
+                }
+                
+                .auth-body {
+                    padding: 20px;
+                }
+            }
+
+            /* Prévention du retour en arrière */
+            .no-back {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        </style>
+        
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body class="{% if app.user %}no-back{% endif %}">
+        {% block body %}{% endblock %}
+        
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        {% if app.user %}
+        <script>
+            // Prévenir le retour en arrière
+            (function() {
+                if (typeof history.pushState === "function") {
+                    history.pushState("jibberish", null, null);
+                    window.onpopstate = function() {
+                        history.pushState('newjibberish', null, null);
+                    };
+                } else {
+                    var ignoreHashChange = true;
+                    window.onhashchange = function() {
+                        if (!ignoreHashChange) {
+                            ignoreHashChange = true;
+                            window.location.hash = Math.random();
+                        } else {
+                            ignoreHashChange = false;
+                        }
+                    };
+                }
+                
+                // Désactiver les raccourcis clavier de navigation
+                document.addEventListener('keydown', function(e) {
+                    // Alt + Left arrow (Back)
+                    if (e.altKey && e.keyCode === 37) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    // Backspace
+                    if (e.keyCode === 8 && (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            })();
+        </script>
+        {% endif %}
+        
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

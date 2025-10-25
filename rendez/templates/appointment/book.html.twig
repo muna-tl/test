@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prendre RDV - {{ doctor.user.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Calendrier de Dr. {{ doctor.user.fullName }}</h5>
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Réserver un créneau</h5>
+                    <p class="text-muted">Spécialité : {{ doctor.specialty }}</p>
+
+                    <form method="post" id="booking-form">
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="date" id="date-input" class="form-control" value="{{ prefillDate ?? '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Heure</label>
+                            <input type="time" name="time" id="time-input" class="form-control" value="{{ prefillTime ?? '' }}" required>
+                        </div>
+
+                        <div class="d-grid">
+                            <button class="btn btn-primary">Confirmer le créneau</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- FullCalendar CSS/JS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.global.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var events = [
+                {% for a in appointments %}
+                {
+                    id: {{ a.id }},
+                    title: '{{ a.patient.fullName|e('js') }}',
+                    start: '{{ a.startAt|date('Y-m-d\\TH:i:s') }}',
+                    end: '{{ a.endAt|date('Y-m-d\\TH:i:s') }}',
+                    color: '#2563eb'
+                }{% if not loop.last %},{% endif %}
+                {% else %}
+                // no events
+                {% endfor %}
+            ];
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                selectMirror: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: events,
+                select: function(info) {
+                    // info.startStr is the ISO date
+                    var dateInput = document.getElementById('date-input');
+                    var timeInput = document.getElementById('time-input');
+
+                    // set date
+                    dateInput.value = info.startStr.slice(0,10);
+                    // if start has time, set time; otherwise default to 09:00
+                    timeInput.value = (info.startStr.length > 10) ? info.startStr.slice(11,16) : '09:00';
+
+                    // scroll to booking form
+                    document.getElementById('booking-form').scrollIntoView({behavior: 'smooth'});
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+{% endblock %}

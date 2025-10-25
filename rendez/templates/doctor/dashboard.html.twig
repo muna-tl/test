@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Docteur - {{ doctor.user.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ path('doctor_dashboard') }}">
+                        <i class="fas fa-user-md me-2"></i>
+                        Dr. {{ doctor.user.fullName }}
+                    </a>
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty }}
+                        </span>
+                        <a class="btn btn-light" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row mb-2">
+            <div class="col-12 text-end">
+                <a href="{{ path('doctor_patients_history') }}" class="btn btn-light">
+                    <i class="fas fa-users me-2"></i>Historique des patients
+                </a>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Mes Rendez-vous
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% set labels = {
+            'today': "Aujourd'hui",
+            'tomorrow': 'Demain',
+            'next_week': 'Semaine prochaine',
+            'next_month': 'Mois prochain'
+        } %}
+        {% for key, label in labels %}
+            <h4 class="mt-4 mb-2 text-primary">{{ label }}</h4>
+            {% if groupedAppointments[key]|length == 0 %}
+                <div class="alert alert-info">Aucun rendez-vous.</div>
+            {% else %}
+                <div class="card shadow-lg border-0 mb-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Statut</th>
+                                        <th>Note</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in groupedAppointments[key] %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ appointment.patient.fullName }}</strong><br>
+                                                <small class="text-muted">{{ appointment.patient.email }}</small>
+                                            </td>
+                                            <td>{{ appointment.appointmentDate|date('d/m/Y') }}</td>
+                                            <td>{{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</td>
+                                            <td>
+                                                {% if appointment.status == 'confirmed' %}
+                                                    <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+                                                        <i class="fas fa-clock me-1"></i>Confirmé
+                                                    </span>
+                                                {% elseif appointment.status == 'done' %}
+                                                    <span class="badge rounded-pill bg-success px-3 py-2">
+                                                        <i class="fas fa-check-circle me-1"></i>Terminé
+                                                    </span>
+                                                {% elseif appointment.status == 'canceled' %}
+                                                    <span class="badge rounded-pill bg-danger px-3 py-2">
+                                                        <i class="fas fa-times-circle me-1"></i>Annulé
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                                                        <i class="fas fa-hourglass-half me-1"></i>En attente
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ appointment.note|default('Aucune note') }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    {% if appointment.status != 'done' %}
+                                                        <form method="post" action="{{ path('doctor_update_status', {'id': appointment.id}) }}" style="display: inline;">
+                                                            <input type="hidden" name="status" value="done">
+                                                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3" title="Marquer comme terminé">
+                                                                <i class="fas fa-check me-1"></i>Terminer
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    {% if appointment.status != 'canceled' %}
+                                                        <form method="post" action="{{ path('doctor_update_status', {'id': appointment.id}) }}" style="display: inline;">
+                                                            <input type="hidden" name="status" value="canceled">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
+                                                                <i class="fas fa-times me-1"></i>Annuler
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

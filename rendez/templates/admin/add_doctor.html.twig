@@ -1,0 +1,219 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un Docteur - Hôpital Cheikh Zaid{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ path('admin_dashboard') }}">
+                        <i class="fas fa-hospital-alt me-2"></i>
+                        Hôpital Cheikh Zaid - Admin
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <a class="btn btn-outline-light me-3" href="{{ path('admin_dashboard') }}">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Retour au Dashboard
+                        </a>
+                        <a class="btn btn-light" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-user-md me-2"></i>
+                            Ajouter un Nouveau Docteur
+                        </h2>
+                        <p class="mb-0 mt-2">Créez un compte docteur avec génération automatique du code ID</p>
+                    </div>
+                    <div class="card-body p-4">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+
+                        <form method="POST" class="needs-validation" novalidate>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">
+                                        <i class="fas fa-user me-1"></i>
+                                        Prénom <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="firstName" 
+                                           name="firstName" 
+                                           required
+                                           placeholder="Entrez le prénom">
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer le prénom.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">
+                                        <i class="fas fa-user me-1"></i>
+                                        Nom <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="lastName" 
+                                           name="lastName" 
+                                           required
+                                           placeholder="Entrez le nom de famille">
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer le nom de famille.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="specialty" class="form-label">
+                                    <i class="fas fa-stethoscope me-1"></i>
+                                    Spécialité <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="specialty" name="specialty" required>
+                                    <option value="">Choisissez une spécialité</option>
+                                    {% for specialty in specialties %}
+                                        <option value="{{ specialty }}">{{ specialty }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">
+                                    Veuillez choisir une spécialité.
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-1"></i>
+                                        Email <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="email" 
+                                           name="email" 
+                                           required
+                                           placeholder="exemple@hopital.ma">
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer une adresse email valide.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>
+                                        Téléphone <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           id="phone" 
+                                           name="phone" 
+                                           required
+                                           placeholder="0612345678">
+                                    <div class="invalid-feedback">
+                                        Veuillez entrer un numéro de téléphone.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>
+                                    Mot de passe <span class="text-danger">*</span>
+                                </label>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password" 
+                                       required
+                                       minlength="6"
+                                       placeholder="Minimum 6 caractères">
+                                <div class="invalid-feedback">
+                                    Le mot de passe doit contenir au moins 6 caractères.
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Le code ID sera généré automatiquement lors de la création du compte.
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Créer le Compte Docteur
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6fd8, #6a4190);
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Choisir une spécialité - Prendre RDV{% endblock %}
+
+{% block body %}
+<header class="bg-primary text-white py-4">
+    <div class="container text-center">
+        <div>
+            <h1 class="mb-0">Hôpital Cheikh Zaid</h1>
+            <small>Fondation</small>
+        </div>
+    </div>
+</header>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-center">
+                    <h5 class="mb-0"><i class="fas fa-stethoscope me-2"></i>Choisir une spécialité</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group" id="specialty-list">
+                        {% for s in specialties %}
+                            <a href="{{ path('appointment_doctors', {'specialty': s}) }}" class="list-group-item list-group-item-action py-3">
+                                <i class="fas fa-chevron-right me-2 text-primary"></i>{{ s }}
+                            </a>
+                        {% else %}
+                            <div class="alert alert-info">Aucune spécialité trouvée.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

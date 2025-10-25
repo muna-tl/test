@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Médecins - {{ specialty }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <h3>Médecins - {{ specialty }}</h3>
+    <div class="row mt-4">
+        {% for d in doctors %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="text-center">{{ d.user.fullName }}</h6>
+                        <p class="text-muted text-center">{{ d.specialty }}</p>
+
+                        <h6>Créneaux disponibles</h6>
+                        {% set slots = slotsByDoctor[d.id] ?? [] %}
+                        {% if slots is empty %}
+                            <div class="alert alert-info">Aucun créneau disponible dans les prochains jours.</div>
+                        {% else %}
+                            <ul class="list-unstyled">
+                                {% for s in slots|slice(0,6) %}
+                                    <li class="mb-2">
+                                        <span class="me-2">{{ s.date }} {{ s.time }}</span>
+                                        <a href="{{ path('appointment_book', {'id': d.id}) }}?date={{ s.date }}&time={{ s.time }}" class="btn btn-sm btn-outline-primary">Réserver</a>
+                                    </li>
+                                {% endfor %}
+                                {% if slots|length > 6 %}
+                                    <li><small class="text-muted">... et {{ slots|length - 6 }} autres créneaux</small></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12"><div class="alert alert-info">Aucun médecin pour cette spécialité.</div></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Administrateur - Hôpital Cheikh Zaid{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ path('admin_dashboard') }}">
+                        <i class="fas fa-hospital-alt me-2"></i>
+                        Hôpital Cheikh Zaid - Admin
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <a class="btn btn-outline-light me-3" href="{{ path('admin_specialties') }}">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            Gérer les spécialités
+                        </a>
+                        <a class="btn btn-outline-light me-3" href="{{ path('admin_add_doctor') }}">
+                            <i class="fas fa-user-md me-2"></i>
+                            Ajouter un docteur
+                        </a>
+                        <a class="btn btn-light" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Dashboard Administrateur
+                        </h2>
+                        <p class="mb-0 mt-2">Bienvenue {{ app.user.fullName }} - Gestion des rendez-vous confirmés</p>
+                        
+                        <!-- Barre de recherche par code de confirmation -->
+                        <form method="get" class="mt-3">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" name="search_code" 
+                                       placeholder="Rechercher par code de confirmation (ex: ABCD-1234)" 
+                                       value="{{ searchCode ?? '' }}">
+                                <button class="btn btn-light" type="submit">
+                                    <i class="fas fa-search me-1"></i>Rechercher
+                                </button>
+                                {% if searchCode %}
+                                    <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-light">
+                                        <i class="fas fa-times me-1"></i>Effacer
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </form>
+                        
+                        <!-- Filtrer par spécialité, jour, mois, année -->
+                        <form method="get" class="mt-3">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-3">
+                                    <label class="form-label mb-0" for="specialtyFilter">Spécialité</label>
+                                    <select class="form-select" id="specialtyFilter" name="specialty">
+                                        <option value="">Toutes les spécialités</option>
+                                        {% for specialty in activeSpecialties %}
+                                            <option value="{{ specialty.name }}" {% if specialty.name == selectedSpecialty %}selected{% endif %}>{{ specialty.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label mb-0" for="filter_day">Jour</label>
+                                    <input type="number" min="1" max="31" class="form-control" id="filter_day" name="filter_day" placeholder="Jour" value="{{ filterDay|default('') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label mb-0" for="filter_month">Mois</label>
+                                    <input type="number" min="1" max="12" class="form-control" id="filter_month" name="filter_month" placeholder="Mois" value="{{ filterMonth|default('') }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label mb-0" for="filter_year">Année</label>
+                                    <input type="number" min="2000" max="2100" class="form-control" id="filter_year" name="filter_year" placeholder="Année" value="{{ filterYear|default('') }}">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button class="btn btn-light w-100" type="submit">Filtrer</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if searchCode %}
+            <!-- Résultat de la recherche par code -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-search me-2"></i>
+                                Résultat de la recherche pour le code : <strong>{{ searchCode }}</strong>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if searchedAppointment %}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Code de confirmation</th>
+                                                <th>Patient</th>
+                                                <th>Docteur</th>
+                                                <th>Spécialité</th>
+                                                <th>Date</th>
+                                                <th>Heure</th>
+                                                <th>Statut</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <span class="badge bg-dark fs-6">{{ searchedAppointment.confirmationCode }}</span>
+                                                </td>
+                                                <td>
+                                                    <strong>{{ searchedAppointment.patient.fullName }}</strong><br>
+                                                    <small class="text-muted">{{ searchedAppointment.patient.email }}</small><br>
+                                                    <small class="text-muted">{{ searchedAppointment.patient.phone }}</small>
+                                                </td>
+                                                <td>{{ searchedAppointment.doctor.user.fullName }}</td>
+                                                <td>{{ searchedAppointment.doctor.specialty }}</td>
+                                                <td>{{ searchedAppointment.startAt|date('d/m/Y') }}</td>
+                                                <td>{{ searchedAppointment.startAt|date('H:i') }} - {{ searchedAppointment.endAt|date('H:i') }}</td>
+                                                <td>
+                                                    {% if searchedAppointment.status == 'confirmed' %}
+                                                        <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+                                                            <i class="fas fa-clock me-1"></i>Confirmé
+                                                        </span>
+                                                    {% elseif searchedAppointment.status == 'done' %}
+                                                        <span class="badge rounded-pill bg-success px-3 py-2">
+                                                            <i class="fas fa-check-circle me-1"></i>Terminé
+                                                        </span>
+                                                    {% elseif searchedAppointment.status == 'canceled' %}
+                                                        <span class="badge rounded-pill bg-danger px-3 py-2">
+                                                            <i class="fas fa-times-circle me-1"></i>Annulé
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                                                            <i class="fas fa-hourglass-half me-1"></i>En attente
+                                                        </span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group-vertical" role="group">
+                                                        {% if searchedAppointment.status != 'confirmed' %}
+                                                            <form method="post" action="{{ path('admin_update_status', {'id': searchedAppointment.id}) }}" style="display: inline;">
+                                                                <input type="hidden" name="status" value="confirmed">
+                                                                <button type="submit" class="btn btn-outline-info btn-sm rounded-pill px-3 mb-1" title="Confirmer">
+                                                                    <i class="fas fa-check-circle me-1"></i>Confirmer
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                        {% if searchedAppointment.status != 'done' %}
+                                                            <form method="post" action="{{ path('admin_update_status', {'id': searchedAppointment.id}) }}" style="display: inline;">
+                                                                <input type="hidden" name="status" value="done">
+                                                                <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3 mb-1" title="Marquer comme terminé">
+                                                                    <i class="fas fa-check me-1"></i>Terminer
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                        {% if searchedAppointment.status != 'canceled' %}
+                                                            <form method="post" action="{{ path('admin_update_status', {'id': searchedAppointment.id}) }}" style="display: inline;">
+                                                                <input type="hidden" name="status" value="canceled">
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
+                                                                    <i class="fas fa-times me-1"></i>Annuler
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Aucun rendez-vous trouvé avec le code <strong>{{ searchCode }}</strong>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if selectedSpecialty %}
+            <h4 class="mb-4">Rendez-vous pour la spécialité : <span class="text-primary">{{ selectedSpecialty }}</span></h4>
+        {% elseif not searchCode %}
+            <h4 class="mb-4">Tous les rendez-vous</h4>
+        {% endif %}
+
+        {% if not searchCode %}
+        {% for specialty, appointments in appointmentsBySpecialty %}
+            {% if not selectedSpecialty or specialty == selectedSpecialty %}
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <strong>{{ specialty }}</strong>
+                    </div>
+                    <div class="card-body">
+                        {% if appointments|length == 0 %}
+                            <p>Aucun rendez-vous pour cette spécialité.</p>
+                        {% else %}
+                                <!-- Planning des rendez-vous par créneau -->
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Code de confirmation</th>
+                                        <th>Patient</th>
+                                        <th>Docteur</th>
+                                        <th>Date</th>
+                                        <th>Heure</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-dark fs-6">{{ appointment.confirmationCode }}</span>
+                                            </td>
+                                            <td>
+                                                <strong>{{ appointment.patient.fullName }}</strong><br>
+                                                <small class="text-muted">{{ appointment.patient.email }}</small>
+                                            </td>
+                                            <td>{{ appointment.doctor.user.fullName }}</td>
+                                            <td>{{ appointment.startAt|date('d/m/Y') }}</td>
+                                            <td>{{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</td>
+                                            <td>
+                                                {% if appointment.status == 'confirmed' %}
+                                                    <span class="badge rounded-pill bg-info text-dark px-3 py-2">
+                                                        <i class="fas fa-clock me-1"></i>Confirmé
+                                                    </span>
+                                                {% elseif appointment.status == 'done' %}
+                                                    <span class="badge rounded-pill bg-success px-3 py-2">
+                                                        <i class="fas fa-check-circle me-1"></i>Terminé
+                                                    </span>
+                                                {% elseif appointment.status == 'canceled' %}
+                                                    <span class="badge rounded-pill bg-danger px-3 py-2">
+                                                        <i class="fas fa-times-circle me-1"></i>Annulé
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge rounded-pill bg-warning text-dark px-3 py-2">
+                                                        <i class="fas fa-hourglass-half me-1"></i>En attente
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    {% if appointment.status != 'confirmed' %}
+                                                        <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
+                                                            <input type="hidden" name="status" value="confirmed">
+                                                            <button type="submit" class="btn btn-outline-info btn-sm rounded-pill px-3" title="Confirmer">
+                                                                <i class="fas fa-check-circle me-1"></i>Confirmer
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    {% if appointment.status != 'done' %}
+                                                        <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
+                                                            <input type="hidden" name="status" value="done">
+                                                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3 ms-1" title="Marquer comme terminé">
+                                                                <i class="fas fa-check me-1"></i>Terminer
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                    {% if appointment.status != 'canceled' %}
+                                                        <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
+                                                            <input type="hidden" name="status" value="canceled">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
+                                                                <i class="fas fa-times me-1"></i>Annuler
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+  
+
+<style>
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        border-radius: 0.375rem 0.375rem 0 0 !important;
+    }
+</style>
+{% endblock %}
