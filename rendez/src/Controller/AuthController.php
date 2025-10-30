@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Entity\DoctorProfile;
 use App\Repository\SpecialtyRepository;
+use App\Repository\DoctorProfileRepository;
 use App\Repository\AppointmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,6 +38,28 @@ class AuthController extends AbstractController
         $activeSpecialties = $specialtyRepository->findActiveSpecialties();
         return $this->render('home.html.twig', [
             'specialties' => $activeSpecialties,
+        ]);
+    }
+
+    #[Route('/public/doctors/{specialty}', name: 'public_doctors_by_specialty')]
+    public function publicDoctorsBySpecialty(string $specialty, SpecialtyRepository $specialtyRepository, DoctorProfileRepository $doctorProfileRepository): Response
+    {
+        // Trouver la spécialité
+        $specialtyEntity = $specialtyRepository->findOneBy(['name' => $specialty]);
+        
+        if (!$specialtyEntity) {
+            return $this->render('public/doctors_list.html.twig', [
+                'doctors' => [],
+                'specialty' => $specialty,
+            ]);
+        }
+
+        // Trouver les docteurs de cette spécialité
+        $doctors = $doctorProfileRepository->findBy(['specialty' => $specialtyEntity]);
+
+        return $this->render('public/doctors_list.html.twig', [
+            'doctors' => $doctors,
+            'specialty' => $specialty,
         ]);
     }
 

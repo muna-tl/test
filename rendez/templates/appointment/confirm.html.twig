@@ -3,31 +3,58 @@
 {% block title %}Confirmation RDV{% endblock %}
 
 {% block body %}
-<div class="container py-5">
-    <div class="alert alert-success">
-        ✓ Votre rendez-vous est confirmé !
-    </div>
-
-    <div class="card shadow">
-        <div class="card-body">
-            <div class="text-center mb-4 p-3" style="background-color: #f0f9ff; border-radius: 8px; border: 2px dashed #2563eb;">
-                <p class="mb-1 text-muted small">Code de Confirmation</p>
-                <h3 class="text-primary mb-0" style="letter-spacing: 2px; font-weight: bold;">{{ appointment.confirmationCode }}</h3>
+<div class="container py-5" style="background-color: none ; min-height: 100vh;">
+    <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #cfe0daff 0%, #059669 100%);">
+        <div class="card-body text-white p-5">
+            <div class="text-center mb-4">
+                <i class="fas fa-check-circle fa-5x mb-3"></i>
+                <h2 class="fw-bold">Rendez-vous Confirmé !</h2>
+                <p class="lead">Votre rendez-vous a été enregistré avec succès.</p>
             </div>
 
-            <h5 class="border-bottom pb-2 mb-3">📋 Détails du Rendez-vous</h5>
-            <p><strong>👨‍⚕️ Docteur :</strong> {{ appointment.doctor.user.fullName }} ({{ appointment.doctor.specialty }})</p>
-            <p><strong>📅 Date :</strong> {{ appointment.startAt|date('d/m/Y') }}</p>
-            <p><strong>🕐 Heure :</strong> {{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</p>
-            <p><strong>👤 Patient :</strong> {{ appointment.patient.fullName }}</p>
-            
-            <div class="alert alert-info mt-4">
-                <strong>ℹ️ Important :</strong> Notez votre code de confirmation <strong>{{ appointment.confirmationCode }}</strong> ou téléchargez le PDF avec le code QR.
+            <div class="bg-white text-dark rounded p-4 mb-4 shadow">
+                <h4 class="mb-3 text-success"><i class="fas fa-calendar-check me-2"></i>Récapitulatif</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-2">
+                            <i class="fas fa-user-md me-2 text-success"></i>
+                            <strong>Docteur :</strong>
+                        </p>
+                        <p class="ms-4">{{ appointment.doctor.user.fullName }}</p>
+                        <p class="ms-4">
+                            <small><i class="fas fa-stethoscope me-1"></i>{{ appointment.doctor.specialty.name }}</small>
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-2">
+                            <i class="fas fa-user me-2 text-success"></i>
+                            <strong>Patient :</strong>
+                        </p>
+                        <p class="ms-4">{{ appointment.patient.fullName }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-2">
+                            <i class="fas fa-calendar me-2 text-success"></i>
+                            <strong>Date :</strong>
+                        </p>
+                        <p class="ms-4">{{ appointment.startAt|date('d/m/Y') }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="mb-2">
+                            <i class="fas fa-clock me-2 text-success"></i>
+                            <strong>Heure :</strong>
+                        </p>
+                        <p class="ms-4">{{ appointment.startAt|date('H:i') }} - {{ appointment.endAt|date('H:i') }}</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="text-center mt-4">
-                <a href="{{ path('appointment_pdf', {'id': appointment.id}) }}" class="btn btn-primary btn-lg">
-                    <i class="fa fa-file-pdf"></i> Télécharger PDF avec QR Code
+            <div class="text-center">
+                <a href="{{ path('appointment_pdf', {'id': appointment.id}) }}" class="btn btn-light btn-lg shadow">
+                    <i class="fas fa-file-pdf me-2"></i>Télécharger le PDF
+                </a>
+                <a href="{{ path('app_dashboard') }}" class="btn btn-outline-light btn-lg ms-2">
+                    <i class="fas fa-home me-2"></i>Retour au tableau de bord
                 </a>
             </div>
         </div>

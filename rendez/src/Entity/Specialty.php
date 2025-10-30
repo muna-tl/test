@@ -97,7 +97,7 @@ class Specialty
     {
         if (!$this->doctorProfiles->contains($doctorProfile)) {
             $this->doctorProfiles->add($doctorProfile);
-            $doctorProfile->setSpecialtyEntity($this);
+            $doctorProfile->setSpecialty($this);
         }
 
         return $this;
@@ -107,8 +107,8 @@ class Specialty
     {
         if ($this->doctorProfiles->removeElement($doctorProfile)) {
             // set the owning side to null (unless already changed)
-            if ($doctorProfile->getSpecialtyEntity() === $this) {
-                $doctorProfile->setSpecialtyEntity(null);
+            if ($doctorProfile->getSpecialty() === $this) {
+                $doctorProfile->setSpecialty(null);
             }
         }
 

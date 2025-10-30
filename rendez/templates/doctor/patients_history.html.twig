@@ -15,7 +15,10 @@
                     </a>
                     <div class="navbar-nav ms-auto">
                         <span class="navbar-text me-3">
-                            <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty }}
+                            <i class="fas fa-id-badge me-1"></i>{{ doctor.doctorId }}
+                        </span>
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialty.name }}
                         </span>
                         <a class="btn btn-light" href="{{ path('app_logout') }}">
                             <i class="fas fa-sign-out-alt me-1"></i>
@@ -29,7 +32,7 @@
 
     <!-- Main Content -->
     <div class="container py-5">
-        <div class="row mb-2">
+        <div class="row mb-4">
             <div class="col-12 text-start">
                 <a href="{{ path('doctor_dashboard') }}" class="btn btn-outline-light">
                     <i class="fas fa-arrow-left me-2"></i>Retour au dashboard
@@ -37,27 +40,7 @@
             </div>
         </div>
         
-        <div class="row mb-3">
-            <div class="col-12">
-                <form method="get" class="row g-2 align-items-center">
-                    <div class="col-md-2">
-                        <label class="form-label mb-0" for="filter_day">Jour</label>
-                        <input type="number" min="1" max="31" class="form-control" id="filter_day" name="filter_day" placeholder="Jour" value="{{ filterDay|default('') }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label mb-0" for="filter_month">Mois</label>
-                        <input type="number" min="1" max="12" class="form-control" id="filter_month" name="filter_month" placeholder="Mois" value="{{ filterMonth|default('') }}">
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label mb-0" for="filter_year">Année</label>
-                        <input type="number" min="2000" max="2100" class="form-control" id="filter_year" name="filter_year" placeholder="Année" value="{{ filterYear|default('') }}">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-light w-100" type="submit">Filtrer</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <div class="row mb-4">
             <div class="col-12">
                 <div class="card shadow-lg border-0">
                     <div class="card-header bg-primary text-white">
@@ -65,10 +48,108 @@
                             <i class="fas fa-users me-2"></i>
                             Historique des patients consultés
                         </h2>
+                        <p class="mb-0 mt-2">Filtrez vos rendez-vous par date</p>
+                        
+                        <!-- Formulaire de filtrage -->
+                        <form method="get" class="mt-3">
+                            <div class="row g-2">
+                                <!-- Recherche par code de confirmation -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-white small">
+                                        <i class="fas fa-hashtag me-1"></i>Code de confirmation
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                        <input type="text" class="form-control" name="search_code" value="{{ searchCode|default('') }}" placeholder="Ex: A123" />
+                                    </div>
+                                </div>
+                                <!-- Filtre par jour -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">
+                                        <i class="fas fa-calendar-day me-1"></i>Jour
+                                    </label>
+                                    <select class="form-select" name="filter_day">
+                                        <option value="">Tous</option>
+                                        {% for day in 1..31 %}
+                                            <option value="{{ day }}" {% if filterDay == day %}selected{% endif %}>{{ day }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Filtre par mois -->
+                                <div class="col-md-4">
+                                    <label class="form-label text-white small">
+                                        <i class="fas fa-calendar-alt me-1"></i>Mois
+                                    </label>
+                                    <select class="form-select" name="filter_month">
+                                        <option value="">Tous</option>
+                                        <option value="1" {% if filterMonth == 1 %}selected{% endif %}>Janvier</option>
+                                        <option value="2" {% if filterMonth == 2 %}selected{% endif %}>Février</option>
+                                        <option value="3" {% if filterMonth == 3 %}selected{% endif %}>Mars</option>
+                                        <option value="4" {% if filterMonth == 4 %}selected{% endif %}>Avril</option>
+                                        <option value="5" {% if filterMonth == 5 %}selected{% endif %}>Mai</option>
+                                        <option value="6" {% if filterMonth == 6 %}selected{% endif %}>Juin</option>
+                                        <option value="7" {% if filterMonth == 7 %}selected{% endif %}>Juillet</option>
+                                        <option value="8" {% if filterMonth == 8 %}selected{% endif %}>Août</option>
+                                        <option value="9" {% if filterMonth == 9 %}selected{% endif %}>Septembre</option>
+                                        <option value="10" {% if filterMonth == 10 %}selected{% endif %}>Octobre</option>
+                                        <option value="11" {% if filterMonth == 11 %}selected{% endif %}>Novembre</option>
+                                        <option value="12" {% if filterMonth == 12 %}selected{% endif %}>Décembre</option>
+                                    </select>
+                                </div>
+
+                                <!-- Filtre par année -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-white small">
+                                        <i class="fas fa-calendar me-1"></i>Année
+                                    </label>
+                                    <select class="form-select" name="filter_year">
+                                        <option value="">Toutes</option>
+                                        {% for year in 2024..2030 %}
+                                            <option value="{{ year }}" {% if filterYear == year %}selected{% endif %}>{{ year }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Boutons d'action -->
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-light" type="submit" title="Appliquer les filtres">
+                                            <i class="fas fa-filter me-1"></i>Filtrer
+                                        </button>
+                                        <a href="{{ path('doctor_patients_history') }}" class="btn btn-outline-light" title="Réinitialiser les filtres">
+                                            <i class="fas fa-redo"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Affichage des filtres actifs -->
+        {% if filterDay or filterMonth or filterYear or searchCode %}
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-filter me-2"></i>
+                <strong>Filtres actifs:</strong>
+                {% if searchCode %}
+                    <span class="badge bg-primary ms-2">Code: {{ searchCode }}</span>
+                {% endif %}
+                {% if filterDay %}
+                    <span class="badge bg-primary ms-2">Jour: {{ filterDay }}</span>
+                {% endif %}
+                {% if filterMonth %}
+                    <span class="badge bg-primary ms-2">
+                        Mois: {{ ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][filterMonth] }}
+                    </span>
+                {% endif %}
+                {% if filterYear %}
+                    <span class="badge bg-primary ms-2">Année: {{ filterYear }}</span>
+                {% endif %}
+            </div>
+        {% endif %}
 
         {% if patientAppointments|length == 0 %}
             <div class="alert alert-info">
@@ -76,6 +157,15 @@
                 Aucun patient consulté pour le moment.
             </div>
         {% else %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="alert alert-light">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Total: {{ totalItems }} patient(s) - Page {{ currentPage }} sur {{ totalPages }}
+                    </div>
+                </div>
+            </div>
+            
             {% for patientId, data in patientAppointments %}
                 <div class="card shadow-lg border-0 mb-4">
                     <div class="card-header bg-secondary text-white">
@@ -131,6 +221,62 @@
                     </div>
                 </div>
             {% endfor %}
+            
+            <!-- Pagination -->
+            {% if totalPages > 1 %}
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Navigation des pages">
+                            <ul class="pagination justify-content-center">
+                                <!-- Bouton Précédent -->
+                                <li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+                                    <a class="page-link" href="{% if currentPage > 1 %}{{ path('doctor_patients_history', {'page': currentPage - 1}) }}{% else %}#{% endif %}">
+                                        <i class="fas fa-chevron-left me-1"></i>Précédent
+                                    </a>
+                                </li>
+                                
+                                <!-- Première page -->
+                                {% if currentPage > 3 %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ path('doctor_patients_history', {'page': 1}) }}">1</a>
+                                    </li>
+                                    {% if currentPage > 4 %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                                
+                                <!-- Pages autour de la page courante -->
+                                {% for i in range(max(1, currentPage - 2), min(totalPages, currentPage + 2)) %}
+                                    <li class="page-item {% if i == currentPage %}active{% endif %}">
+                                        <a class="page-link" href="{{ path('doctor_patients_history', {'page': i}) }}">{{ i }}</a>
+                                    </li>
+                                {% endfor %}
+                                
+                                <!-- Dernière page -->
+                                {% if currentPage < totalPages - 2 %}
+                                    {% if currentPage < totalPages - 3 %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ path('doctor_patients_history', {'page': totalPages}) }}">{{ totalPages }}</a>
+                                    </li>
+                                {% endif %}
+                                
+                                <!-- Bouton Suivant -->
+                                <li class="page-item {% if currentPage == totalPages %}disabled{% endif %}">
+                                    <a class="page-link" href="{% if currentPage < totalPages %}{{ path('doctor_patients_history', {'page': currentPage + 1}) }}{% else %}#{% endif %}">
+                                        Suivant<i class="fas fa-chevron-right ms-1"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 </div>

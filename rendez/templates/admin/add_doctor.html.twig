@@ -142,21 +142,43 @@
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <label for="password" class="form-label">
-                                    <i class="fas fa-lock me-1"></i>
-                                    Mot de passe <span class="text-danger">*</span>
-                                </label>
-                                <input type="password" 
-                                       class="form-control" 
-                                       id="password" 
-                                       name="password" 
-                                       required
-                                       minlength="6"
-                                       placeholder="Minimum 6 caractères">
-                                <div class="invalid-feedback">
-                                    Le mot de passe doit contenir au moins 6 caractères.
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="password" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>
+                                        Mot de passe <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           name="password" 
+                                           required
+                                           minlength="6"
+                                           placeholder="Minimum 6 caractères">
+                                    <div class="invalid-feedback">
+                                        Le mot de passe doit contenir au moins 6 caractères.
+                                    </div>
                                 </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="confirmPassword" class="form-label">
+                                        <i class="fas fa-lock me-1"></i>
+                                        Confirmer le mot de passe <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="confirmPassword" 
+                                           name="confirmPassword" 
+                                           required
+                                           minlength="6"
+                                           placeholder="Retapez le mot de passe">
+                                    <div class="invalid-feedback" id="passwordMismatch">
+                                        Les mots de passe ne correspondent pas.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
                                 <div class="form-text">
                                     <i class="fas fa-info-circle me-1"></i>
                                     Le code ID sera généré automatiquement lors de la création du compte.
@@ -183,8 +205,24 @@
     'use strict';
     window.addEventListener('load', function() {
         var forms = document.getElementsByClassName('needs-validation');
+        var password = document.getElementById('password');
+        var confirmPassword = document.getElementById('confirmPassword');
+        
+        // Validation de correspondance des mots de passe
+        function validatePassword() {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity("Les mots de passe ne correspondent pas");
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        }
+        
+        password.addEventListener('change', validatePassword);
+        confirmPassword.addEventListener('keyup', validatePassword);
+        
         var validation = Array.prototype.filter.call(forms, function(form) {
             form.addEventListener('submit', function(event) {
+                validatePassword();
                 if (form.checkValidity() === false) {
                     event.preventDefault();
                     event.stopPropagation();

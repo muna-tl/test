@@ -188,27 +188,26 @@
             doctorsPanel.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2">Chargement des médecins...</p></div>';
             selectedSpecialtyLabel.textContent = specialty;
             
-            fetch('{{ path('appointment_doctors', {'specialty': 'SPECIALTY_PLACEHOLDER'}) }}'.replace('SPECIALTY_PLACEHOLDER', encodeURIComponent(specialty)))
+            fetch('{{ path('public_doctors_by_specialty', {'specialty': 'SPECIALTY_PLACEHOLDER'}) }}'.replace('SPECIALTY_PLACEHOLDER', encodeURIComponent(specialty)))
                 .then(r => r.text())
                 .then(html => {
-                    // try to extract the doctors list from the returned page
+                    // Extract the doctors list from the returned page
                     const tmp = document.createElement('div');
                     tmp.innerHTML = html;
-                    const list = tmp.querySelector('#doctors-list') || tmp.querySelector('.list-group') || tmp.querySelector('.card-body');
+                    const list = tmp.querySelector('#doctors-list');
                     if (list) {
                         doctorsPanel.innerHTML = '';
                         const clonedList = list.cloneNode(true);
-                        // Add some styling to the cloned content
                         clonedList.classList.add('doctors-container');
                         doctorsPanel.appendChild(clonedList);
                         
-                        // Add click handlers for doctor cards if they exist
-                        const doctorCards = doctorsPanel.querySelectorAll('.card, .list-group-item');
+                        // Add click handlers for doctor cards
+                        const doctorCards = doctorsPanel.querySelectorAll('.card');
                         doctorCards.forEach(card => {
                             card.style.cursor = 'pointer';
                             card.addEventListener('click', function(e) {
                                 e.preventDefault();
-                                const doctorName = this.querySelector('h5, .card-title, strong')?.textContent || 'Médecin';
+                                const doctorName = this.querySelector('h5, .card-title')?.textContent || 'ce médecin';
                                 alert('Pour prendre rendez-vous avec ' + doctorName + ', veuillez d\'abord créer un compte et vous connecter.');
                             });
                         });
@@ -219,31 +218,6 @@
                 .catch(() => {
                     doctorsPanel.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Erreur lors du chargement des médecins. Veuillez réessayer.</div>';
                 });
-            
-            fetch('{{ path('appointment_doctors', {'specialty': 'SPECIALTY_PLACEHOLDER'}) }}'.replace('SPECIALTY_PLACEHOLDER', encodeURIComponent(specialty)))
-                .then(r => r.text())
-                .then(html => {
-                    // try to extract the doctors list from the returned page
-                    const tmp = document.createElement('div');
-                    tmp.innerHTML = html;
-                    const list = tmp.querySelector('#doctors-list') || tmp.querySelector('.list-group') || tmp.querySelector('.card-body');
-                    if (list) {
-                        doctorsPanel.innerHTML = '';
-                        const clonedList = list.cloneNode(true);
-                        // Add some styling to the cloned content
-                        clonedList.classList.add('doctors-container');
-                        doctorsPanel.appendChild(clonedList);
-                        
-                        // Add click handlers for doctor cards if they exist
-                        const doctorCards = doctorsPanel.querySelectorAll('.card, .list-group-item');
-                        doctorCards.forEach(card => {
-                            card.style.cursor = 'pointer';
-                            card.addEventListener('click', function(e) {
-                                e.preventDefault();
-                                const doctorName = this.querySelector('h5, .card-title, strong')?.textContent || 'Médecin';
-                                alert('Pour prendre rendez-vous avec ' + doctorName + ', veuillez d\'abord créer un compte et vous connecter.');
-                            });
-                        });
         }
 
         specialtyButtons.forEach(b => b.addEventListener('click', function(){

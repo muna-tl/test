@@ -41,16 +41,19 @@ class AdminController extends AbstractController
 
         // Si un code de confirmation est recherché
         if ($searchCode) {
-            $searchedAppointment = $this->appointmentRepository->findOneBy(['confirmationCode' => trim($searchCode)]);
+            $normalized = strtoupper(trim($searchCode));
+            $searchedAppointment = $this->appointmentRepository->findOneBy(['confirmationCode' => $normalized]);
             return $this->render('admin/dashboard.html.twig', [
                 'activeSpecialties' => $activeSpecialties,
                 'appointmentsBySpecialty' => [],
                 'selectedSpecialty' => $selectedSpecialty,
-                'searchCode' => $searchCode,
+                'searchCode' => $normalized,
                 'searchedAppointment' => $searchedAppointment,
                 'filterDay' => $filterDay,
                 'filterMonth' => $filterMonth,
                 'filterYear' => $filterYear,
+                'currentPage' => 1,
+                'totalPages' => 1,
             ]);
         }
 
@@ -65,22 +68,45 @@ class AdminController extends AbstractController
         // Organiser les rendez-vous par spécialité
         $appointmentsBySpecialty = [];
         foreach ($filteredAppointments as $appointment) {
-            $specialty = $appointment->getDoctor()->getSpecialty();
+            $specialty = $appointment->getDoctor()->getSpecialty() ? $appointment->getDoctor()->getSpecialty()->getName() : 'Non définie';
             if (!isset($appointmentsBySpecialty[$specialty])) {
                 $appointmentsBySpecialty[$specialty] = [];
             }
             $appointmentsBySpecialty[$specialty][] = $appointment;
         }
+        
+        // Pagination
+        $page = max(1, $request->query->getInt('page', 1));
+        $itemsPerPage = 10;
+        $totalItems = count($filteredAppointments);
+        $totalPages = max(1, ceil($totalItems / $itemsPerPage));
+        $page = min($page, $totalPages);
+        
+        // Paginer les appointments par spécialité
+        $offset = ($page - 1) * $itemsPerPage;
+        $paginatedAppointments = array_slice($filteredAppointments, $offset, $itemsPerPage);
+        
+        $paginatedBySpecialty = [];
+        foreach ($paginatedAppointments as $appointment) {
+            $specialty = $appointment->getDoctor()->getSpecialty() ? $appointment->getDoctor()->getSpecialty()->getName() : 'Non définie';
+            if (!isset($paginatedBySpecialty[$specialty])) {
+                $paginatedBySpecialty[$specialty] = [];
+            }
+            $paginatedBySpecialty[$specialty][] = $appointment;
+        }
 
         return $this->render('admin/dashboard.html.twig', [
             'activeSpecialties' => $activeSpecialties,
-            'appointmentsBySpecialty' => $appointmentsBySpecialty,
+            'appointmentsBySpecialty' => $paginatedBySpecialty,
             'selectedSpecialty' => $selectedSpecialty,
             'searchCode' => null,
             'searchedAppointment' => null,
             'filterDay' => $filterDay,
             'filterMonth' => $filterMonth,
             'filterYear' => $filterYear,
+            'currentPage' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
         ]);
     }
 
@@ -112,6 +138,13 @@ class AdminController extends AbstractController
             $email = $request->request->get('email');
             $phone = $request->request->get('phone');
             $password = $request->request->get('password');
+            $confirmPassword = $request->request->get('confirmPassword');
+
+            // Vérifier que les mots de passe correspondent
+            if ($password !== $confirmPassword) {
+                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+                return $this->redirectToRoute('admin_add_doctor');
+            }
 
             // Vérifier si l'email existe déjà
             $existingUser = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
@@ -139,7 +172,14 @@ class AdminController extends AbstractController
             // Créer le profil docteur
             $doctorProfile = new DoctorProfile();
             $doctorProfile->setUser($user);
-            $doctorProfile->setSpecialty($specialty);
+            
+            // Récupérer l'entité Specialty
+            $specialtyEntity = $this->specialtyRepository->findOneBy(['name' => $specialty]);
+            if (!$specialtyEntity) {
+                $this->addFlash('error', 'Spécialité invalide.');
+                return $this->redirectToRoute('admin_add_doctor');
+            }
+            $doctorProfile->setSpecialty($specialtyEntity);
             
             // Générer un code ID unique
             $doctorId = 'DR' . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);

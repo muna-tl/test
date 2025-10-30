@@ -84,7 +84,7 @@
                                             <strong>Dr. {{ appointment.doctor.user.fullName }}</strong><br>
                                             <small class="text-muted">{{ appointment.doctor.user.email }}</small>
                                         </td>
-                                        <td>{{ appointment.doctor.specialty }}</td>
+                                        <td>{{ appointment.doctor.specialty.name }}</td>
                                         <td>
                                             {% if appointment.status == 'confirmed' %}
                                                 <span class="badge rounded-pill bg-info text-dark px-3 py-2">

@@ -17,12 +17,9 @@ class DoctorProfile
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(length: 150)]
-    private ?string $specialty = null;
-
     #[ORM\ManyToOne(targetEntity: Specialty::class, inversedBy: 'doctorProfiles')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Specialty $specialtyEntity = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Specialty $specialty = null;
 
     #[ORM\Column(length: 20, unique: true)]
     private ?string $doctorId = null;
@@ -43,12 +40,12 @@ class DoctorProfile
         return $this;
     }
 
-    public function getSpecialty(): ?string
+    public function getSpecialty(): ?Specialty
     {
         return $this->specialty;
     }
 
-    public function setSpecialty(string $specialty): static
+    public function setSpecialty(?Specialty $specialty): static
     {
         $this->specialty = $specialty;
         return $this;
@@ -62,17 +59,6 @@ class DoctorProfile
     public function setDoctorId(string $doctorId): static
     {
         $this->doctorId = $doctorId;
-        return $this;
-    }
-
-    public function getSpecialtyEntity(): ?Specialty
-    {
-        return $this->specialtyEntity;
-    }
-
-    public function setSpecialtyEntity(?Specialty $specialtyEntity): static
-    {
-        $this->specialtyEntity = $specialtyEntity;
         return $this;
     }
 }

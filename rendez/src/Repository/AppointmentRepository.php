@@ -21,7 +21,7 @@ class AppointmentRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('a')
             ->leftJoin('a.doctor', 'd')
-            ->leftJoin('d.specialtyEntity', 's')
+            ->leftJoin('d.specialty', 's')
             ->addSelect('d', 's')
             ->orderBy('a.appointmentDate', 'ASC')
             ->addOrderBy('a.appointmentTime', 'ASC');

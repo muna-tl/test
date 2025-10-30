@@ -95,11 +95,20 @@ class AppointmentController extends AbstractController
     }
 
     #[Route('/doctors/{specialty}', name: 'appointment_doctors')]
-    public function doctors(string $specialty, EntityManagerInterface $em): Response
+    public function doctors(string $specialty, EntityManagerInterface $em, SpecialtyRepository $specialtyRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_PATIENT');
 
-        $doctors = $em->getRepository(DoctorProfile::class)->findBy(['specialty' => $specialty]);
+        // Trouver l'entité Specialty par son nom
+        $specialtyEntity = $specialtyRepository->findOneBy(['name' => $specialty]);
+        
+        if (!$specialtyEntity) {
+            $this->addFlash('error', 'Spécialité non trouvée.');
+            return $this->redirectToRoute('appointment_specialties');
+        }
+
+        // Trouver les docteurs de cette spécialité
+        $doctors = $em->getRepository(DoctorProfile::class)->findBy(['specialty' => $specialtyEntity]);
 
         // Generate available slots per doctor for the next 7 days
         $slotsByDoctor = [];
@@ -247,13 +256,17 @@ class AppointmentController extends AbstractController
     private function generateConfirmationCode(EntityManagerInterface $em): string
     {
         do {
-            // Generate a random 8-character code (format: XXXX-XXXX)
-            $code = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 4) . '-' . substr(md5(uniqid(mt_rand(), true)), 0, 4));
-            
-            // Check if code already exists
+            // Generate a 4-character PIN where the first char is a letter (A-Z)
+            // and the next 3 chars are digits (000-999), e.g., A123, Z045
+            $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $first = $letters[random_int(0, strlen($letters) - 1)];
+            $digits = str_pad((string) random_int(0, 999), 3, '0', STR_PAD_LEFT);
+            $code = $first . $digits;
+
+            // Ensure uniqueness
             $existing = $em->getRepository(Appointment::class)->findOneBy(['confirmationCode' => $code]);
         } while ($existing !== null);
-        
+
         return $code;
     }
 }

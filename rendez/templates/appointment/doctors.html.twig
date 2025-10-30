@@ -11,7 +11,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h6 class="text-center">{{ d.user.fullName }}</h6>
-                        <p class="text-muted text-center">{{ d.specialty }}</p>
+                        <p class="text-muted text-center">{{ d.specialty.name }}</p>
 
                         <h6>Créneaux disponibles</h6>
                         {% set slots = slotsByDoctor[d.id] ?? [] %}

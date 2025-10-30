@@ -1,65 +1,56 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-	<meta charset="UTF-8">
-	<title>Confirmation de Rendez-vous</title>
-	<style>
-		body { 
-			font-family: Arial, sans-serif; 
-			color: #222; 
-			margin: 40px;
-		}
-		.header {
-			text-align: center;
-			margin-bottom: 30px;
-		}
-		.confirmation-code {
-			text-align: center;
-			background-color: #f0f9ff;
-			padding: 20px;
-			margin: 30px auto;
-			border: 3px solid #2563eb;
-			border-radius: 10px;
-			width: 60%;
-		}
-		.confirmation-code h2 {
-			color: #2563eb;
-			margin: 0;
-			font-size: 32px;
-			letter-spacing: 3px;
-		}
-		.details {
-			margin: 30px 0;
-		}
-		.details p {
-			font-size: 1.1em;
-			margin: 15px 0;
-			line-height: 1.6;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>Confirmation de Rendez-vous</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; color: #222; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .details { margin: 0 auto; width: 80%; }
+        .details h2 { color: #2563eb; }
+        .details p { font-size: 1.1em; margin: 8px 0; }
+        .confirmation-code { 
+            background-color: #2563eb; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            margin: 20px 0;
+            border: 3px solid #1e40af;
+        }
+        .confirmation-code .label { 
+            font-size: 1em; 
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+        .confirmation-code .code { 
+            font-size: 2.5em; 
+            font-weight: bold; 
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .footer { margin-top: 30px; text-align: center; font-size: 0.9em; color: #888; }
+    </style>
 </head>
 <body>
-	<div class="header">
-		<h1>Confirmation de Rendez-vous</h1>
-	</div>
-
-	<div class="confirmation-code">
-		<p style="margin: 0; font-size: 0.9em; color: #666;">Code de Confirmation</p>
-		<h2>{{ confirmationCode }}</h2>
-	</div>
-
-	<div class="details">
-		<h2>Détails du Rendez-vous</h2>
-		<p><strong>Nom du patient :</strong> {{ patientName }}</p>
-		<p><strong>Docteur :</strong> {{ doctorName }}</p>
-		<p><strong>Date :</strong> {{ date }}</p>
-		<p><strong>Heure :</strong> {{ heureStart }} - {{ heureEnd }}</p>
-	</div>
-
-	<div style="text-align: center; margin-top: 50px; color: #888; font-size: 0.9em;">
-		<p><strong>Important :</strong> Veuillez présenter ce document lors de votre visite.</p>
-		<p>Pour toute modification ou annulation, veuillez contacter le secrétariat.</p>
-	</div>
+    <div class="header">
+        <h1>Confirmation de Rendez-vous</h1>
+        <p>Système de Rendez-vous Hospitalier</p>
+    </div>
+    <div class="details">
+        <h2>Récapitulatif</h2>
+        <p><strong>Docteur :</strong> {{ doctorName }}</p>
+        <p><strong>Date :</strong> {{ date }}</p>
+        <p><strong>Heure :</strong> {{ heureStart }} - {{ heureEnd }}</p>
+        <p><strong>Patient :</strong> {{ patientName }}</p>
+        
+        <div class="confirmation-code">
+            <div class="label">Code de Confirmation</div>
+            <div class="code">{{ confirmationCode }}</div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Merci d'avoir utilisé notre service. Veuillez présenter ce document lors de votre visite.</p>
+    </div>
 </body>
 </html>
