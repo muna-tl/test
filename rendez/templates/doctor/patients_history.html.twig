@@ -218,6 +218,11 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="mt-3">
+                            <a href="{{ path('medical_record_view', {'patientId': data.patient.id}) }}" class="btn btn-success">
+                                <i class="fas fa-folder-open me-2"></i>Dossier Médical
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% endfor %}

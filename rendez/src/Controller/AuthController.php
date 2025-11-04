@@ -145,6 +145,20 @@ class AuthController extends AbstractController
         ]);
     }
 
+    #[Route('/doctor', name: 'doctor_redirect')]
+    public function doctorRedirect(): Response
+    {
+        // Redirection automatique vers le dashboard docteur
+        return $this->redirectToRoute('doctor_dashboard');
+    }
+
+    #[Route('/admin', name: 'admin_redirect')]
+    public function adminRedirect(): Response
+    {
+        // Redirection automatique vers le dashboard admin
+        return $this->redirectToRoute('admin_dashboard');
+    }
+
     #[Route('/patient/appointments', name: 'patient_appointments')]
     public function patientAppointments(AppointmentRepository $appointmentRepository): Response
     {

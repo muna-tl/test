@@ -1,0 +1,296 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier Médical - {{ patient.fullName }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand fw-bold fs-4" href="{{ is_granted('ROLE_DOCTOR') ? path('doctor_dashboard') : (is_granted('ROLE_ADMIN') ? path('admin_dashboard') : path('patient_dashboard')) }}">
+                        <i class="fas fa-hospital-alt me-2"></i>
+                        Hôpital Cheikh Zaid
+                    </a>
+                    <div class="navbar-nav ms-auto">
+                        <a class="btn btn-outline-light" href="{{ is_granted('ROLE_DOCTOR') ? path('doctor_patients_history') : (is_granted('ROLE_ADMIN') ? path('admin_dashboard') : path('patient_dashboard')) }}">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <h2 class="mb-0 text-white">
+                            <i class="fas fa-folder-open me-2"></i>
+                            Dossier Médical
+                        </h2>
+                        <p class="mb-0 mt-2 text-white">Patient: <strong>{{ patient.fullName }}</strong> - {{ patient.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        <!-- Tabs -->
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-4" id="medicalRecordTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                            <i class="fas fa-info-circle me-2"></i>Informations Générales
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="analyses-tab" data-bs-toggle="tab" data-bs-target="#analyses" type="button" role="tab">
+                            <i class="fas fa-flask me-2"></i>Analyses
+                            <span class="badge bg-primary ms-1">{{ analyses|length }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="radios-tab" data-bs-toggle="tab" data-bs-target="#radios" type="button" role="tab">
+                            <i class="fas fa-x-ray me-2"></i>Radios
+                            <span class="badge bg-primary ms-1">{{ radios|length }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="observations-tab" data-bs-toggle="tab" data-bs-target="#observations" type="button" role="tab">
+                            <i class="fas fa-notes-medical me-2"></i>Observations
+                            <span class="badge bg-primary ms-1">{{ observations|length }}</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="medicalRecordTabsContent">
+                    <!-- Informations Générales -->
+                    <div class="tab-pane fade show active" id="info" role="tabpanel">
+                        <form method="post" action="{{ path('medical_record_update_info', {'id': medicalRecord.id}) }}">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-tint me-1"></i>Groupe Sanguin</label>
+                                    <select class="form-select" name="bloodType" {{ is_granted('ROLE_DOCTOR') ? '' : 'disabled' }}>
+                                        <option value="">Non renseigné</option>
+                                        <option value="A+" {{ medicalRecord.bloodType == 'A+' ? 'selected' : '' }}>A+</option>
+                                        <option value="A-" {{ medicalRecord.bloodType == 'A-' ? 'selected' : '' }}>A-</option>
+                                        <option value="B+" {{ medicalRecord.bloodType == 'B+' ? 'selected' : '' }}>B+</option>
+                                        <option value="B-" {{ medicalRecord.bloodType == 'B-' ? 'selected' : '' }}>B-</option>
+                                        <option value="AB+" {{ medicalRecord.bloodType == 'AB+' ? 'selected' : '' }}>AB+</option>
+                                        <option value="AB-" {{ medicalRecord.bloodType == 'AB-' ? 'selected' : '' }}>AB-</option>
+                                        <option value="O+" {{ medicalRecord.bloodType == 'O+' ? 'selected' : '' }}>O+</option>
+                                        <option value="O-" {{ medicalRecord.bloodType == 'O-' ? 'selected' : '' }}>O-</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="fas fa-phone me-1"></i>Contact d'Urgence</label>
+                                    <input type="text" class="form-control" name="emergencyContact" value="{{ medicalRecord.emergencyContact }}" {{ is_granted('ROLE_DOCTOR') ? '' : 'readonly' }} />
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label"><i class="fas fa-allergies me-1"></i>Allergies</label>
+                                    <textarea class="form-control" name="allergies" rows="3" {{ is_granted('ROLE_DOCTOR') ? '' : 'readonly' }}>{{ medicalRecord.allergies }}</textarea>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label"><i class="fas fa-heartbeat me-1"></i>Maladies Chroniques</label>
+                                    <textarea class="form-control" name="chronicDiseases" rows="3" {{ is_granted('ROLE_DOCTOR') ? '' : 'readonly' }}>{{ medicalRecord.chronicDiseases }}</textarea>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label"><i class="fas fa-pills me-1"></i>Médicaments Actuels</label>
+                                    <textarea class="form-control" name="currentMedications" rows="3" {{ is_granted('ROLE_DOCTOR') ? '' : 'readonly' }}>{{ medicalRecord.currentMedications }}</textarea>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label"><i class="fas fa-sticky-note me-1"></i>Notes</label>
+                                    <textarea class="form-control" name="notes" rows="4" {{ is_granted('ROLE_DOCTOR') ? '' : 'readonly' }}>{{ medicalRecord.notes }}</textarea>
+                                </div>
+
+                                {% if is_granted('ROLE_DOCTOR') %}
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Enregistrer les Modifications
+                                        </button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Créé le: {{ medicalRecord.createdAt|date('d/m/Y à H:i') }}
+                                </small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <small class="text-muted">
+                                    <i class="fas fa-edit me-1"></i>Dernière modification: {{ medicalRecord.updatedAt|date('d/m/Y à H:i') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analyses -->
+                    <div class="tab-pane fade" id="analyses" role="tabpanel">
+                        {% if is_granted('ROLE_DOCTOR') %}
+                            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addDocumentModal" data-type="analyse">
+                                <i class="fas fa-plus me-2"></i>Ajouter une Analyse
+                            </button>
+                        {% endif %}
+
+                        {% if analyses|length == 0 %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>Aucune analyse pour le moment.
+                            </div>
+                        {% else %}
+                            <div class="row g-3">
+                                {% for doc in analyses %}
+                                    {% include 'medical_record/_document_card.html.twig' with {'document': doc} %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Radios -->
+                    <div class="tab-pane fade" id="radios" role="tabpanel">
+                        {% if is_granted('ROLE_DOCTOR') %}
+                            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addDocumentModal" data-type="radio">
+                                <i class="fas fa-plus me-2"></i>Ajouter une Radio
+                            </button>
+                        {% endif %}
+
+                        {% if radios|length == 0 %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>Aucune radio pour le moment.
+                            </div>
+                        {% else %}
+                            <div class="row g-3">
+                                {% for doc in radios %}
+                                    {% include 'medical_record/_document_card.html.twig' with {'document': doc} %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Observations -->
+                    <div class="tab-pane fade" id="observations" role="tabpanel">
+                        {% if is_granted('ROLE_DOCTOR') %}
+                            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addDocumentModal" data-type="observation">
+                                <i class="fas fa-plus me-2"></i>Ajouter une Observation
+                            </button>
+                        {% endif %}
+
+                        {% if observations|length == 0 %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>Aucune observation pour le moment.
+                            </div>
+                        {% else %}
+                            <div class="row g-3">
+                                {% for doc in observations %}
+                                    {% include 'medical_record/_document_card.html.twig' with {'document': doc} %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Add Document -->
+{% if is_granted('ROLE_DOCTOR') %}
+<div class="modal fade" id="addDocumentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-upload me-2"></i>Ajouter un Document
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ path('medical_record_add_document', {'id': medicalRecord.id}) }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" name="type" id="documentType" value="observation">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Titre</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Fichier</label>
+                        <input type="file" class="form-control" name="file" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
+                        <small class="text-muted">Formats acceptés: PDF, Images, Word, Excel (Max 10MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>Télécharger
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+    // Set document type when opening modal
+    const addDocumentModal = document.getElementById('addDocumentModal');
+    if (addDocumentModal) {
+        addDocumentModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const type = button.getAttribute('data-type');
+            document.getElementById('documentType').value = type;
+        });
+    }
+</script>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #667eea;
+        font-weight: 500;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #fff;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea #667eea #fff;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+    }
+</style>
+{% endblock %}

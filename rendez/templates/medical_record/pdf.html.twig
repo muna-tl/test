@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dossier Médical - {{ patient.fullName }}</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            color: #10b981;
+            margin: 0;
+            font-size: 24px;
+        }
+        .header p {
+            color: #666;
+            margin: 5px 0;
+        }
+        .info-box {
+            background-color: #f3f4f6;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h2 {
+            color: #10b981;
+            margin-top: 0;
+            font-size: 16px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 180px;
+            color: #374151;
+        }
+        .info-value {
+            flex: 1;
+            color: #1f2937;
+        }
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            background-color: #10b981;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .document-item {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .document-title {
+            font-weight: bold;
+            color: #1f2937;
+            font-size: 13px;
+        }
+        .document-type {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .document-description {
+            color: #6b7280;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+        .document-meta {
+            font-size: 10px;
+            color: #9ca3af;
+        }
+        .no-data {
+            color: #9ca3af;
+            font-style: italic;
+            padding: 10px;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🏥 DOSSIER MÉDICAL</h1>
+        <p>Hôpital Cheikh Zaid</p>
+        <p style="font-size: 10px;">Généré le {{ "now"|date('d/m/Y à H:i') }}</p>
+    </div>
+
+    <!-- Patient Information -->
+    <div class="info-box">
+        <h2>📋 Informations du Patient</h2>
+        <div class="info-row">
+            <div class="info-label">Nom complet:</div>
+            <div class="info-value">{{ patient.fullName }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Email:</div>
+            <div class="info-value">{{ patient.email }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Téléphone:</div>
+            <div class="info-value">{{ patient.phone|default('Non renseigné') }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Médecin référent:</div>
+            <div class="info-value">{{ doctorName }}</div>
+        </div>
+    </div>
+
+    <!-- Medical Information -->
+    <div class="section">
+        <div class="section-title">🩺 Informations Médicales Générales</div>
+        
+        <table>
+            <tr>
+                <th>Groupe Sanguin</th>
+                <td>{{ medicalRecord.bloodType|default('Non renseigné') }}</td>
+            </tr>
+            <tr>
+                <th>Contact d'Urgence</th>
+                <td>{{ medicalRecord.emergencyContact|default('Non renseigné') }}</td>
+            </tr>
+        </table>
+
+        <div class="info-row" style="margin-bottom: 15px;">
+            <div class="info-label">Allergies:</div>
+            <div class="info-value">{{ medicalRecord.allergies|default('Aucune allergie connue')|nl2br }}</div>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 15px;">
+            <div class="info-label">Maladies Chroniques:</div>
+            <div class="info-value">{{ medicalRecord.chronicDiseases|default('Aucune maladie chronique')|nl2br }}</div>
+        </div>
+
+        <div class="info-row" style="margin-bottom: 15px;">
+            <div class="info-label">Médicaments Actuels:</div>
+            <div class="info-value">{{ medicalRecord.currentMedications|default('Aucun médicament')|nl2br }}</div>
+        </div>
+
+        {% if medicalRecord.notes %}
+            <div class="info-row">
+                <div class="info-label">Notes:</div>
+                <div class="info-value">{{ medicalRecord.notes|nl2br }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Analyses -->
+    <div class="section">
+        <div class="section-title">🧪 Analyses ({{ analyses|length }})</div>
+        {% if analyses|length > 0 %}
+            {% for doc in analyses %}
+                <div class="document-item">
+                    <div class="document-header">
+                        <div class="document-title">{{ doc.title }}</div>
+                        <div class="document-type">Analyse</div>
+                    </div>
+                    {% if doc.description %}
+                        <div class="document-description">{{ doc.description }}</div>
+                    {% endif %}
+                    <div class="document-meta">
+                        📅 {{ doc.uploadedAt|date('d/m/Y à H:i') }} | 
+                        👨‍⚕️ {{ doc.uploadedBy.fullName }} | 
+                        📄 {{ doc.filePath }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">Aucune analyse enregistrée</div>
+        {% endif %}
+    </div>
+
+    <!-- Radios -->
+    <div class="section">
+        <div class="section-title">📷 Radiographies ({{ radios|length }})</div>
+        {% if radios|length > 0 %}
+            {% for doc in radios %}
+                <div class="document-item">
+                    <div class="document-header">
+                        <div class="document-title">{{ doc.title }}</div>
+                        <div class="document-type">Radio</div>
+                    </div>
+                    {% if doc.description %}
+                        <div class="document-description">{{ doc.description }}</div>
+                    {% endif %}
+                    <div class="document-meta">
+                        📅 {{ doc.uploadedAt|date('d/m/Y à H:i') }} | 
+                        👨‍⚕️ {{ doc.uploadedBy.fullName }} | 
+                        📄 {{ doc.filePath }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">Aucune radiographie enregistrée</div>
+        {% endif %}
+    </div>
+
+    <!-- Observations -->
+    <div class="section">
+        <div class="section-title">📝 Observations Médicales ({{ observations|length }})</div>
+        {% if observations|length > 0 %}
+            {% for doc in observations %}
+                <div class="document-item">
+                    <div class="document-header">
+                        <div class="document-title">{{ doc.title }}</div>
+                        <div class="document-type">Observation</div>
+                    </div>
+                    {% if doc.description %}
+                        <div class="document-description">{{ doc.description }}</div>
+                    {% endif %}
+                    <div class="document-meta">
+                        📅 {{ doc.uploadedAt|date('d/m/Y à H:i') }} | 
+                        👨‍⚕️ {{ doc.uploadedBy.fullName }} | 
+                        📄 {{ doc.filePath }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">Aucune observation enregistrée</div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>Hôpital Cheikh Zaid</strong></p>
+        <p>Dossier créé le: {{ medicalRecord.createdAt ? medicalRecord.createdAt|date('d/m/Y à H:i') : 'N/A' }}</p>
+        <p>Dernière mise à jour: {{ medicalRecord.updatedAt ? medicalRecord.updatedAt|date('d/m/Y à H:i') : 'N/A' }}</p>
+        <p style="margin-top: 10px; color: #ef4444;">Document confidentiel - Usage médical uniquement</p>
+    </div>
+</body>
+</html>

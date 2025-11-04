@@ -199,8 +199,14 @@
                                 <span class="badge bg-secondary">{{ searchedAppointment.status }}</span>
                             {% endif %}
 
-                            <a class="btn btn-outline-primary btn-sm ms-auto" href="{{ path('appointment_pdf', {'id': searchedAppointment.id}) }}">
-                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            <a class="btn btn-outline-success btn-sm ms-auto" href="{{ path('medical_record_view', {'patientId': searchedAppointment.patient.id}) }}">
+                                <i class="fas fa-folder-open me-1"></i>Voir Dossier
+                            </a>
+                            <a class="btn btn-outline-danger btn-sm" href="{{ path('medical_record_pdf', {'patientId': searchedAppointment.patient.id}) }}">
+                                <i class="fas fa-download me-1"></i>Télécharger PDF
+                            </a>
+                            <a class="btn btn-outline-primary btn-sm" href="{{ path('appointment_pdf', {'id': searchedAppointment.id}) }}">
+                                <i class="fas fa-file-pdf me-1"></i>PDF Rendez-vous
                             </a>
                         </div>
                     </div>
@@ -247,6 +253,7 @@
                                         <th>Date</th>
                                         <th>Heure</th>
                                         <th>Statut</th>
+                                        <th>Dossier Médical</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -285,7 +292,17 @@
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <div class="btn-group" role="group">
+                                                <div class="d-flex flex-column gap-1">
+                                                    <a href="{{ path('medical_record_view', {'patientId': appointment.patient.id}) }}" class="btn btn-outline-primary btn-sm" title="Voir le dossier médical">
+                                                        <i class="fas fa-folder-open me-1"></i>Voir Dossier
+                                                    </a>
+                                                    <a href="{{ path('medical_record_pdf', {'patientId': appointment.patient.id}) }}" class="btn btn-outline-success btn-sm" title="Télécharger le dossier en PDF">
+                                                        <i class="fas fa-download me-1"></i>Télécharger PDF
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-1">
                                                     {% if appointment.status != 'confirmed' %}
                                                         <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
                                                             <input type="hidden" name="status" value="confirmed">
@@ -297,7 +314,7 @@
                                                     {% if appointment.status != 'done' %}
                                                         <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
                                                             <input type="hidden" name="status" value="done">
-                                                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3 ms-1" title="Marquer comme terminé">
+                                                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3" title="Marquer comme terminé">
                                                                 <i class="fas fa-check me-1"></i>Terminer
                                                             </button>
                                                         </form>
@@ -305,7 +322,7 @@
                                                     {% if appointment.status != 'canceled' %}
                                                         <form method="post" action="{{ path('admin_update_status', {'id': appointment.id}) }}" style="display: inline;">
                                                             <input type="hidden" name="status" value="canceled">
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
                                                                 <i class="fas fa-times me-1"></i>Annuler
                                                             </button>
                                                         </form>

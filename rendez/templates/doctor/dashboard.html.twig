@@ -103,10 +103,13 @@
                                         <td>{{ appointment.note|default('Aucune note') }}</td>
                                         <td>
                                             <div class="btn-group" role="group">
+                                                <a href="{{ path('medical_record_view', {'patientId': appointment.patient.id}) }}" class="btn btn-outline-success btn-sm rounded-pill px-3" title="Voir le dossier médical">
+                                                    <i class="fas fa-folder-open me-1"></i>Dossier
+                                                </a>
                                                 {% if appointment.status != 'done' %}
                                                     <form method="post" action="{{ path('doctor_update_status', {'id': appointment.id}) }}" style="display: inline;">
                                                         <input type="hidden" name="status" value="done">
-                                                        <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3" title="Marquer comme terminé">
+                                                        <button type="submit" class="btn btn-outline-success btn-sm rounded-pill px-3 ms-1" title="Marquer comme terminé">
                                                             <i class="fas fa-check me-1"></i>Terminer
                                                         </button>
                                                     </form>
