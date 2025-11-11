@@ -1,41 +1,92 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Médecins - {{ specialty }}{% endblock %}
+{% block title %}Médecins — {{ specialty }}{% endblock %}
 
 {% block body %}
 <div class="container py-5">
-    <h3>Médecins - {{ specialty }}</h3>
-    <div class="row mt-4">
-        {% for d in doctors %}
-            <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="text-center">{{ d.user.fullName }}</h6>
-                        <p class="text-muted text-center">{{ d.specialty.name }}</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Médecins — <small class="text-muted">{{ specialty }}</small></h2>
+            <p class="text-muted small mb-0">Choisissez un médecin et réservez un créneau.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <a href="{{ path('appointment_specialties') }}" class="btn btn-outline-secondary btn-sm">← Spécialités</a>
+        </div>
+    </div>
 
-                        <h6>Créneaux disponibles</h6>
-                        {% set slots = slotsByDoctor[d.id] ?? [] %}
-                        {% if slots is empty %}
-                            <div class="alert alert-info">Aucun créneau disponible dans les prochains jours.</div>
-                        {% else %}
-                            <ul class="list-unstyled">
-                                {% for s in slots|slice(0,6) %}
-                                    <li class="mb-2">
-                                        <span class="me-2">{{ s.date }} {{ s.time }}</span>
-                                        <a href="{{ path('appointment_book', {'id': d.id}) }}?date={{ s.date }}&time={{ s.time }}" class="btn btn-sm btn-outline-primary">Réserver</a>
-                                    </li>
-                                {% endfor %}
-                                {% if slots|length > 6 %}
-                                    <li><small class="text-muted">... et {{ slots|length - 6 }} autres créneaux</small></li>
+    {% if doctors is empty %}
+        <div class="alert alert-info">Aucun médecin pour cette spécialité.</div>
+    {% else %}
+        <div class="row g-3" id="doctors-grid">
+            {% for d in doctors %}
+                {% set slots = (slotsByDoctor is defined) ? (slotsByDoctor[d.id] ?? []) : [] %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 doctor-card">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:64px;height:64px;">
+                                        <i class="fas fa-user-md fa-2x"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="mb-0">Dr. {{ d.user.fullName }}</h5>
+                                    <small class="text-muted">{{ d.specialty.name }}</small>
+                                    {% if d.city is defined and d.city is not empty %}
+                                        <div class="small text-muted">{{ d.city }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <p class="text-muted small mb-3">{{ d.bio|default('Docteur expérimenté, disponible pour consultations.') }}</p>
+
+                            <div class="mt-auto">
+                                <h6 class="mb-2">Prochains créneaux</h6>
+                                {% if slots is empty %}
+                                    <div class="text-muted small mb-3">Aucun créneau listé — consultez la page du médecin ou réservez directement.</div>
+                                {% else %}
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        {% for s in slots|slice(0,4) %}
+                                            <a href="{{ path('appointment_book', {'id': d.id}) }}?date={{ s.date }}&time={{ s.time }}" class="btn btn-sm btn-outline-primary">{{ s.date }} • {{ s.time }}</a>
+                                        {% endfor %}
+                                        {% if slots|length > 4 %}
+                                            <div class="align-self-center small text-muted">... et {{ slots|length - 4 }} autres</div>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
-                            </ul>
-                        {% endif %}
+
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('appointment_book', {'id': d.id}) }}" class="btn btn-primary btn-sm">Réserver</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <div class="col-12"><div class="alert alert-info">Aucun médecin pour cette spécialité.</div></div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
+
+<script>
+    (function(){
+        const search = document.getElementById('doctor-search');
+        if (!search) return;
+        search.addEventListener('input', function(){
+            const q = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('#doctors-grid .doctor-card');
+            cards.forEach(card => {
+                const txt = card.textContent.toLowerCase();
+                card.closest('.col-12, .col-md-6, .col-lg-4').style.display = q === '' || txt.includes(q) ? '' : 'none';
+            });
+        });
+    })();
+</script>
+
+<style>
+    /* Small visual polish for doctors grid */
+    .doctor-card { border-radius: 12px; transition: transform .12s ease, box-shadow .12s ease; }
+    .doctor-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(2,6,23,0.08); }
+    #doctor-search { background: rgba(255,255,255,0.95); }
+</style>
+
 {% endblock %}

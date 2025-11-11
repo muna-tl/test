@@ -114,14 +114,23 @@ class AdminController extends AbstractController
     public function updateAppointmentStatus(Appointment $appointment, Request $request): Response
     {
         $newStatus = $request->request->get('status');
-        
-        if (in_array($newStatus, [Appointment::STATUS_CONFIRMED, Appointment::STATUS_DONE, Appointment::STATUS_CANCELED])) {
+
+        // If the appointment is already marked as done, disallow any further changes from admin
+        if ($appointment->getStatus() === Appointment::STATUS_DONE) {
+            $this->addFlash('error', 'Ce rendez-vous est déjà terminé et ne peut plus être modifié.');
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
+        // Admin is allowed only to confirm or cancel appointments. "Done" is doctor-only.
+        $allowed = [Appointment::STATUS_CONFIRMED, Appointment::STATUS_CANCELED];
+
+        if (in_array($newStatus, $allowed, true)) {
             $appointment->setStatus($newStatus);
             $this->entityManager->flush();
-            
+
             $this->addFlash('success', 'Statut du rendez-vous mis à jour avec succès');
         } else {
-            $this->addFlash('error', 'Statut invalide');
+            $this->addFlash('error', 'Statut invalide ou action non autorisée pour l\'administrateur');
         }
 
         return $this->redirectToRoute('admin_dashboard');

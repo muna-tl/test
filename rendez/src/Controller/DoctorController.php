@@ -31,11 +31,16 @@ class DoctorController extends AbstractController
             throw $this->createNotFoundException('Profil docteur non trouvé');
         }
 
-        // Récupérer tous les rendez-vous du docteur
-        $appointments = $this->appointmentRepository->findBy(
-            ['doctor' => $doctorProfile],
-            ['appointmentDate' => 'ASC', 'appointmentTime' => 'ASC']
-        );
+        // Récupérer uniquement les rendez-vous du docteur qui ne sont pas terminés
+        $qb = $this->appointmentRepository->createQueryBuilder('a')
+            ->where('a.doctor = :doctor')
+            ->andWhere('a.status NOT IN (:excluded)')
+            ->setParameter('doctor', $doctorProfile)
+            ->setParameter('excluded', [Appointment::STATUS_DONE, Appointment::STATUS_CANCELED])
+            ->orderBy('a.appointmentDate', 'ASC')
+            ->addOrderBy('a.appointmentTime', 'ASC');
+
+        $appointments = $qb->getQuery()->getResult();
 
         return $this->render('doctor/dashboard.html.twig', [
             'doctor' => $doctorProfile,

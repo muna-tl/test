@@ -38,14 +38,6 @@
                             </button>
                         </form>
                     {% endif %}
-                    {% if a.status != 'canceled' %}
-                        <form method="post" action="{{ path('doctor_update_status', {'id': a.id}) }}" style="display:inline;">
-                            <input type="hidden" name="status" value="canceled">
-                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-2" title="Annuler" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
-                                <i class="fas fa-times me-1"></i>Annuler
-                            </button>
-                        </form>
-                    {% endif %}
                 </div>
             </div>
         {% else %}
